@@ -16,8 +16,7 @@ Data Science is not just my profession; it's my playground. I love unraveling in
 Toolkit: 
 - Python (scikit-learn, statsmodels, etc.)
 - R
-- SQL
-- noSQL
+- SQL & noSQL
 - MATLAB
 - Spark
 - Scala
@@ -27,20 +26,19 @@ As a firm believer in seamless and efficient development processes, I delve into
 
 Toolkit: 
 - Python (scripting)
-- AWS
-- GCP
-- Bash
-- Powershell
+- AWS (Amazon Web Services)
+- GCP (Google Cloud Platform)
+- Bash & Powershell
 - Docker & Kubernetes
 - Ansible
 
-### Full-stack development
+### Full-stack development 👨‍💻
+
 - Java (SpringBoot)
-- JavaScript (Node.js)
+- JavaScript (React & React Native + node.js)
 - HTML
 - CSS
 - Python (Flask)
-- React & React Native
 
 ## Let's Collaborate!
 
