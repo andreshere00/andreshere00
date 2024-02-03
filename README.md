@@ -18,17 +18,20 @@ Hello there! I'm Andrés Herencia, a passionate professional with a background i
 |                                      | - MATLAB                                                     |
 |                                      | - Spark                                                      |
 |                                      | - Scala                                                      |
+|--------------------------------------|--------------------------------------------------------------|
 | **DevOps & Cloud Computing**          | - Python (scripting)                                         |
 |                                      | - AWS (Amazon Web Services)                                  |
 |                                      | - GCP (Google Cloud Platform)                                |
 |                                      | - Bash & Powershell                                          |
 |                                      | - Docker & Kubernetes                                       |
 |                                      | - Ansible                                                    |
+|--------------------------------------|--------------------------------------------------------------|
 | **Full-stack development**            | - Java (SpringBoot)                                          |
 |                                      | - JavaScript (React & React Native + node.js)               |
 |                                      | - HTML                                                       |
 |                                      | - CSS                                                        |
 |                                      | - Python (Django & Streamlit)                                |
+|--------------------------------------|--------------------------------------------------------------|
 
 
 ## Let's Collaborate!
