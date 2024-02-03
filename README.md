@@ -13,7 +13,7 @@ Hello there! I'm Andrés Herencia, a passionate professional with a background i
 ### Data Science & Big Data 📊
 
 <details>
-<summary><span style="color:blue">**Toolkit**</span></summary>
+<summary><span style="color:blue"><b>Toolkit</b></span></summary>
 
 - Python (scikit-learn, statsmodels, etc.)
 - R
@@ -27,7 +27,7 @@ Hello there! I'm Andrés Herencia, a passionate professional with a background i
 ### DevOps & Cloud Computing ☁️
 
 <details>
-<summary><span style="color:green">**Toolkit**</span></summary>
+<summary><span style="color:green"><b>Toolkit</b></span></summary>
 
 - Python (scripting)
 - AWS (Amazon Web Services)
@@ -41,7 +41,7 @@ Hello there! I'm Andrés Herencia, a passionate professional with a background i
 ### Full-stack development 👨‍💻
 
 <details>
-<summary><span style="color:orange">**Toolkit**</span></summary>
+<summary><span style="color:orange"><b>Toolkit</b></span></summary>
 
 - Java (SpringBoot)
 - JavaScript (React & React Native + node.js)
