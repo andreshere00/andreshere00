@@ -10,37 +10,30 @@ Hello there! I'm Andrés Herencia, a passionate professional with a background i
 
 ## Interests
 
-### Data Science & Big Data 📊
-Data Science is not just my profession; it's my playground. I love unraveling insights from complex datasets, crafting predictive models, and deriving meaningful conclusions.
++----------------------------------------+------------------------------------------------------------+
+|               **Category**             |                      **Skills**                              |
++----------------------------------------+------------------------------------------------------------+
+| **Data Science & Big Data**             | - Python (scikit-learn, statsmodels, etc.)                  |
+|                                        | - R                                                          |
+|                                        | - SQL & noSQL                                                |
+|                                        | - MATLAB                                                     |
+|                                        | - Spark                                                      |
+|                                        | - Scala                                                      |
++----------------------------------------+------------------------------------------------------------+
+| **DevOps & Cloud Computing**            | - Python (scripting)                                         |
+|                                        | - AWS (Amazon Web Services)                                  |
+|                                        | - GCP (Google Cloud Platform)                                |
+|                                        | - Bash & Powershell                                          |
+|                                        | - Docker & Kubernetes                                       |
+|                                        | - Ansible                                                    |
++----------------------------------------+------------------------------------------------------------+
+| **Full-stack development**              | - Java (SpringBoot)                                          |
+|                                        | - JavaScript (React & React Native + node.js)               |
+|                                        | - HTML                                                       |
+|                                        | - CSS                                                        |
+|                                        | - Python (Django & Streamlit)                                |
++----------------------------------------+------------------------------------------------------------+
 
-**Toolkit:**
-- Python (scikit-learn, statsmodels, etc.)
-- R
-- SQL & noSQL
-- MATLAB
-- Spark
-- Scala
-
-### DevOps & Cloud Computing ☁️
-As a firm believer in seamless and efficient development processes, I delve into the world of DevOps. My expertise encompasses tools like Docker, Kubernetes, AWS, and GCP, ensuring that software deployment and infrastructure management are as smooth as they can be.
-
-**Toolkit:**
-- Python (scripting)
-- AWS (Amazon Web Services)
-- GCP (Google Cloud Platform)
-- Bash & Powershell
-- Docker & Kubernetes
-- Ansible
-
-### Full-stack development 👨‍💻
-From my background in Telematics Engineering, I made some webpages that allow me to code simple WPA. Specially, I am eager to code frontend with JavaScript and React and backend with Springboot but I can move to Python environment with Django and Streamlit.
-
-**Toolkit:**
-- Java (SpringBoot)
-- JavaScript (React & React Native + node.js)
-- HTML
-- CSS
-- Python (Django & Streamlit)
 
 ## Let's Collaborate!
 
