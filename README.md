@@ -11,7 +11,7 @@ Hello there! I'm Andrés Herencia, a passionate professional with a background i
 ## Interests
 
 +----------------------------------------+------------------------------------------------------------+
-|               **Category**             |                      **Skills**                              |
+|                 **Category**             |                      **Skills**                              |
 +----------------------------------------+------------------------------------------------------------+
 | **Data Science & Big Data**             | - Python (scikit-learn, statsmodels, etc.)                  |
 |                                        | - R                                                          |
@@ -33,7 +33,6 @@ Hello there! I'm Andrés Herencia, a passionate professional with a background i
 |                                        | - CSS                                                        |
 |                                        | - Python (Django & Streamlit)                                |
 +----------------------------------------+------------------------------------------------------------+
-
 
 ## Let's Collaborate!
 
