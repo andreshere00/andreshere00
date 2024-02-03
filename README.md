@@ -6,7 +6,7 @@
 
 Hello there! I'm Andrés Herencia, a passionate professional with a background in Telecommunication Engineering and a Master's degree in Data Science. I thrive on learning and teaching new paradigms over technology. 
 
-***Supporting others is the best way to support yourself.***
+***If I know, I teach. If I don't know, I learn..***
 
 ## Interests
 
