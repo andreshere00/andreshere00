@@ -10,29 +10,26 @@ Hello there! I'm Andrés Herencia, a passionate professional with a background i
 
 ## Interests
 
-+----------------------------------------+------------------------------------------------------------+
-|                 **Category**             |                      **Skills**                              |
-+----------------------------------------+------------------------------------------------------------+
-| **Data Science & Big Data**             | - Python (scikit-learn, statsmodels, etc.)                  |
-|                                        | - R                                                          |
-|                                        | - SQL & noSQL                                                |
-|                                        | - MATLAB                                                     |
-|                                        | - Spark                                                      |
-|                                        | - Scala                                                      |
-+----------------------------------------+------------------------------------------------------------+
-| **DevOps & Cloud Computing**            | - Python (scripting)                                         |
-|                                        | - AWS (Amazon Web Services)                                  |
-|                                        | - GCP (Google Cloud Platform)                                |
-|                                        | - Bash & Powershell                                          |
-|                                        | - Docker & Kubernetes                                       |
-|                                        | - Ansible                                                    |
-+----------------------------------------+------------------------------------------------------------+
-| **Full-stack development**              | - Java (SpringBoot)                                          |
-|                                        | - JavaScript (React & React Native + node.js)               |
-|                                        | - HTML                                                       |
-|                                        | - CSS                                                        |
-|                                        | - Python (Django & Streamlit)                                |
-+----------------------------------------+------------------------------------------------------------+
+| **Category**                         | **Skills**                                                    |
+|--------------------------------------|--------------------------------------------------------------|
+| **Data Science & Big Data**           | - Python (scikit-learn, statsmodels, etc.)                    |
+|                                      | - R                                                          |
+|                                      | - SQL & noSQL                                                |
+|                                      | - MATLAB                                                     |
+|                                      | - Spark                                                      |
+|                                      | - Scala                                                      |
+| **DevOps & Cloud Computing**          | - Python (scripting)                                         |
+|                                      | - AWS (Amazon Web Services)                                  |
+|                                      | - GCP (Google Cloud Platform)                                |
+|                                      | - Bash & Powershell                                          |
+|                                      | - Docker & Kubernetes                                       |
+|                                      | - Ansible                                                    |
+| **Full-stack development**            | - Java (SpringBoot)                                          |
+|                                      | - JavaScript (React & React Native + node.js)               |
+|                                      | - HTML                                                       |
+|                                      | - CSS                                                        |
+|                                      | - Python (Django & Streamlit)                                |
+
 
 ## Let's Collaborate!
 
