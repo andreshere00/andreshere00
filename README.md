@@ -25,6 +25,7 @@ I'm Andrés Herencia, an **IT Engineer** with over **three years of experience d
 <p align="center">
   <img src="https://img.shields.io/badge/LLMs-8A2BE2?style=for-the-badge&logo=ai&logoColor=white" alt="LLMs" />
   <img src="https://img.shields.io/badge/LangChain-FF9900?style=for-the-badge&logo=langchain&logoColor=white" alt="LangChain" />
+  <img src="https://img.shields.io/badge/MCP-4B8BBE?style=for-the-badge&logo=cloud&logoColor=white" alt="MCP" />
   <img src="https://img.shields.io/badge/PyTorch-EE4C2C?style=for-the-badge&logo=pytorch&logoColor=white" alt="PyTorch" />
   <img src="https://img.shields.io/badge/Scikit--learn-F7931E?style=for-the-badge&logo=scikitlearn&logoColor=white" alt="Scikit-learn" />
 </p>
@@ -34,7 +35,6 @@ I'm Andrés Herencia, an **IT Engineer** with over **three years of experience d
   <img src="https://img.shields.io/badge/AWS-232F3E?style=for-the-badge&logo=amazonaws&logoColor=white" alt="AWS" />
   <img src="https://img.shields.io/badge/Azure-007FFF?style=for-the-badge&logo=microsoft-azure&logoColor=white" alt="Azure" />
   <img src="https://img.shields.io/badge/GCP-4285F4?style=for-the-badge&logo=googlecloud&logoColor=white" alt="GCP" />
-  <img src="https://img.shields.io/badge/MCP-4B8BBE?style=for-the-badge&logo=cloud&logoColor=white" alt="MCP" />
   <img src="https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white" alt="Docker" />
 </p>
 
