@@ -2,13 +2,16 @@
 
 **Hello everyone!**
 
-I'm Andrés Herencia, an **IT Engineer** with over **three years of experience developing systems based on Artificial Intelligence**. My passion for mathematics and helping others has led me to undertake several projects in the field of **Machine Learning & AI**.
+I'm Andrés Herencia, an **IT Engineer** with over **three years of experience developing systems and architectures based on Artificial Intelligence**. My passion for mathematics and helping others has led me to undertake several projects in this field.
+
+---
 
 ## 👨🏽‍💻 About me
 
-* **Master's Degree in Statistics and Data Science** from the Polytechnic University and the Complutense University of Madrid.
-* I speak fluent **Spanish** and **English**, with some proficiency in Italian.
-* Published **Master's Thesis**: [Analysis of Transformer architecture](https://docta.ucm.es/entities/publication/093fac7e-17fa-4d56-94ab-c984067ad3ac).
+* I have a [**Master's Degree in Statistics and Data Science**](https://www.upm.es/internacional/Students/StudiesDegrees/UniversityMasters/Master%20programs?id=9.7&fmt=detail) from the Universidad Politécnica de Madrid & Universidad Complutense de Madrid.
+* I fluently speak **Spanish** and **English**, with some proficiency in **Italian**.
+* I have published my **Master's Thesis**: [Analysis of Transformer architecture](https://docta.ucm.es/entities/publication/093fac7e-17fa-4d56-94ab-c984067ad3ac).
+* I am an [**AWS-Certified Solutions Architect**](https://www.credly.com/badges/f1549694-8ebf-489b-882d-4cad12fa593a/public_url).
 
 ---
 
