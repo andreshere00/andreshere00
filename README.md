@@ -11,7 +11,7 @@ I'm Andrés Herencia, an **IT Engineer** with over **three years of experience d
 * I have a [**Master's Degree in Statistics and Data Science**](https://www.upm.es/internacional/Students/StudiesDegrees/UniversityMasters/Master%20programs?id=9.7&fmt=detail) from the Universidad Politécnica de Madrid & Universidad Complutense de Madrid.
 * I fluently speak **Spanish** and **English**, with some proficiency in **Italian**.
 * I have published my **Master's Thesis**: [Analysis of Transformer architecture](https://docta.ucm.es/entities/publication/093fac7e-17fa-4d56-94ab-c984067ad3ac).
-* I am an [**AWS-Certified Solutions Architect**](https://www.credly.com/badges/f1549694-8ebf-489b-882d-4cad12fa593a/public_url).
+* I have 2 AWS Certifications ([**Solutions Architect Associate (SAA-C03)**](https://www.credly.com/badges/f1549694-8ebf-489b-882d-4cad12fa593a/public_url) and [**Machine Learning Engineer Associate (MLA-C01)**](https://www.credly.com/badges/94609834-c001-4dec-b8aa-c07957444f1e/public_url)).
 
 ---
 
@@ -61,9 +61,13 @@ I'm Andrés Herencia, an **IT Engineer** with over **three years of experience d
 
 > Python library to convert documents into LLM-friendly Markdown chunks with multiple split strategies and embedding support.
 
+## [AWS CLI MCP](https://github.com/andreshere00/aws_cli_mcp)
+[![Stars](https://img.shields.io/github/stars/andreshere00/aws_cli_mcp?style=flat-square&color=fdca40)](https://github.com/andreshere00/aws_cli_mcp/stargazers)
+[![Forks](https://img.shields.io/github/forks/andreshere00/aws_cli_mcp?style=flat-square&color=306bac)](https://github.com/andreshere00/aws_cli_mcp/network/members)
+
 ### [SVG-to-PNG](https://github.com/andreshere00/SVG-to-PNG)  
-[![Stars](https://img.shields.io/github/stars/andreshere00/SVG-to-PNG?style=flat-square&color=fdca40)](https://github.com/andreshere00/SVG-to-PNG/stargazers)
-[![Forks](https://img.shields.io/github/forks/andreshere00/SVG-to-PNG?style=flat-square&color=306bac)](https://github.com/andreshere00/SVG-to-PNG/network/members)
+[![Stars](https://img.shields.io/github/stars/andreshere00/aws_cli_mcp?style=flat-square&color=fdca40)](https://github.com/andreshere00/aws_cli_mcp/stargazers)
+[![Forks](https://img.shields.io/github/forks/andreshere00/aws_cli_mcp?style=flat-square&color=306bac)](https://github.com/andreshere00/aws_cli_mcp/network/members)
 
 > CLI/API tool for traceable SVG→PNG conversion using CairoSVG, Inkscape, or PDF pipelines.
 
