@@ -61,9 +61,11 @@ I'm Andrés Herencia, an **IT Engineer** with over **three years of experience d
 
 > Python library to convert documents into LLM-friendly Markdown chunks with multiple split strategies and embedding support.
 
-## [AWS CLI MCP](https://github.com/andreshere00/aws_cli_mcp)
+### [AWS CLI MCP](https://github.com/andreshere00/aws_cli_mcp)
 [![Stars](https://img.shields.io/github/stars/andreshere00/aws_cli_mcp?style=flat-square&color=fdca40)](https://github.com/andreshere00/aws_cli_mcp/stargazers)
 [![Forks](https://img.shields.io/github/forks/andreshere00/aws_cli_mcp?style=flat-square&color=306bac)](https://github.com/andreshere00/aws_cli_mcp/network/members)
+
+> An AI-powered agent to execute Amazon Web Services (AWS) CLI instructions using a server based on the Model Context Protocol (MCP).
 
 ### [SVG-to-PNG](https://github.com/andreshere00/SVG-to-PNG)  
 [![Stars](https://img.shields.io/github/stars/andreshere00/aws_cli_mcp?style=flat-square&color=fdca40)](https://github.com/andreshere00/aws_cli_mcp/stargazers)
