@@ -197,7 +197,71 @@ This is the make-or-break layer for the financial sector:
 
 ---
 
-## 10. Summary
+## 10. Alternative services (no Amazon Connect, no OpenSearch Serverless / Kendra)
+
+The architecture is intentionally modular: the **telephony layer** and the **retrieval
+layer** are pluggable. You can drop the two services and keep everything else
+(Transcribe, Comprehend, Bedrock, Polly, routing, guardrails, MLOps) unchanged.
+
+### 10.1 Replacing Amazon Connect (telephony / CCaaS)
+
+| Option | What it gives you | When to choose it |
+|---|---|---|
+| **Amazon Chime SDK** (PSTN Audio, **Voice Connector** for SIP/BYO carrier, **SIP media applications**, Voice Focus, call analytics) | AWS-native, build-your-own voice infra; bring your own carrier via SIP trunking | You want full control of the call flow without a packaged CCaaS, staying inside AWS |
+| **Amazon Kinesis Video Streams** (audio stream) → **Transcribe streaming** | Raw media capture/streaming into the STT pipeline | Custom/programmatic ingestion, or feeding existing PBX audio into AWS |
+| **Twilio** (Programmable Voice / Flex) | Mature programmable telephony + contact center UI, easy SIP/APIs | You already use Twilio or want a flexible CPaaS |
+| **Genesys Cloud CX** | Enterprise CCaaS with native AWS AI integrations (Transcribe/Lex/Bedrock) | Large enterprise contact center, existing Genesys footprint |
+| **NICE CXone / Five9 / Cisco Webex CC / Avaya** | Established enterprise CCaaS, integrate via SIP + APIs | Existing vendor relationship or on-prem migration |
+
+> Practical AWS-native path: **Chime SDK Voice Connector** (BYO carrier via SIP) →
+> **Kinesis Video Streams** → **Transcribe streaming** → same Comprehend/Bedrock/Polly
+> core. Routing and orchestration move into **Step Functions + Lambda** instead of
+> Connect contact flows.
+
+### 10.2 Replacing OpenSearch Serverless / Kendra (vector store & retrieval)
+
+**Amazon Bedrock Knowledge Bases** natively supports several vector stores, so you can
+keep the managed RAG pipeline and only swap the backend:
+
+| Option | Type | Notes |
+|---|---|---|
+| **Aurora PostgreSQL Serverless v2 + `pgvector`** | AWS-native, SQL | Cost-effective, familiar, transactional + vector in one DB; great default replacement |
+| **Amazon Neptune Analytics** | AWS-native, graph + vector | Enables **GraphRAG** (relationships between products, accounts, policies) |
+| **Amazon MemoryDB** (vector search) | AWS-native, in-memory | Very low-latency retrieval for real-time voice |
+| **Amazon DocumentDB** (vector search) | AWS-native, document DB | If data is already document-modeled in DocumentDB |
+| **Amazon RDS for PostgreSQL + `pgvector`** | AWS-native, SQL | Provisioned alternative to Aurora |
+| **Pinecone / MongoDB Atlas Vector Search / Redis Enterprise Cloud** | Third-party managed | Bedrock KB-supported; managed SaaS |
+| **Milvus / Qdrant / Weaviate / Chroma** on **EKS/EC2** | Self-hosted OSS | Max control / data residency; you operate it |
+
+**If you also drop Bedrock Knowledge Bases** and want enterprise/keyword relevance
+without Kendra:
+
+- **Amazon OpenSearch Service** (provisioned/managed cluster, not Serverless) for hybrid
+  **BM25 + vector** search.
+- **Aurora PostgreSQL + `pgvector`** with hybrid search (full-text `tsvector` + vector)
+  for an all-SQL stack.
+
+> Recommended default swap: **Aurora PostgreSQL Serverless v2 + pgvector** as the vector
+> store (still behind Bedrock Knowledge Bases). It is AWS-native, cheap at low/medium
+> scale, and keeps operational surface small. Choose **Neptune Analytics** if
+> relationship-aware (GraphRAG) answers add value, or **MemoryDB** if retrieval latency
+> is critical for the voice experience.
+
+### 10.3 Impact on the rest of the design
+
+- **SplitterMR** ingestion is unchanged — it produces the same Markdown chunks/embeddings
+  regardless of the vector store.
+- **AWS CLI MCP** action layer is unchanged.
+- Removing Connect means **routing and conversation state** must be handled explicitly in
+  **Step Functions + Lambda** (and optionally **Lex** for structured dialog), and **agent
+  assist** (Amazon Q in Connect, Contact Lens) is replaced by your CCaaS's equivalent or a
+  custom agent UI fed by Transcribe + Bedrock.
+- Security/compliance controls (KMS, PrivateLink, PII redaction, guardrails, audit) apply
+  identically to every alternative.
+
+---
+
+## 11. Summary
 
 The proposed solution keeps the original **Speech-to-Text → automatic response →
 routing** core intact, but elevates it into a complete, compliant, banking-grade
