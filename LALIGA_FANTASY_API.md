@@ -264,6 +264,28 @@ authredirect://com.lfp.laligafantasy
 El client ID es un identificador público, no un secreto. No se ha observado un
 `client_secret` en los clientes nativos.
 
+### Metadatos OIDC
+
+Las dos políticas publican metadatos OIDC y claves activas. El issuer observado
+es:
+
+```text
+https://login.laliga.es/335316eb-f606-4361-bb86-35a7edcdcec1/v2.0/
+```
+
+| Método | Endpoint | Finalidad |
+|---|---|---|
+| `GET` | `https://login.laliga.es/laligadspprob2c.onmicrosoft.com/v2.0/.well-known/openid-configuration?p={policy}` | Discovery OIDC |
+| `GET` | `https://login.laliga.es/laligadspprob2c.onmicrosoft.com/discovery/v2.0/keys?p={policy}` | JWKS para verificar firmas RS256 |
+| `GET` | `https://login.laliga.es/laligadspprob2c.onmicrosoft.com/oauth2/v2.0/authorize?p={policy}` | Inicia login interactivo |
+| `POST` | `https://login.laliga.es/laligadspprob2c.onmicrosoft.com/oauth2/v2.0/token?p={policy}` | Password, código o refresh token |
+| `GET` | `https://login.laliga.es/laligadspprob2c.onmicrosoft.com/oauth2/v2.0/logout?p={policy}` | Cierra la sesión SSO de la política |
+
+`{policy}` es `B2C_1A_ResourceOwnerv2` o
+`B2C_1A_5ULAIP_PARAMETRIZED_SIGNIN`. Discovery no publica endpoints `userinfo`
+ni de revocación. Borrar tokens locales no elimina por sí solo las cookies SSO
+del navegador; para eso debe completarse `/logout`.
+
 ### Login propio de LALIGA: email y contraseña
 
 Las cuentas locales pueden usar Resource Owner Password Credentials (ROPC):
@@ -428,18 +450,26 @@ client_id=af88bcff-1157-40a0-b579-030728aacf0b
 scope=<EL_MISMO_SCOPE_DEL_LOGIN>
 ```
 
-La política debe conservarse junto a los tokens:
+Azure AD B2C documenta que debe utilizarse la misma política o user flow que
+emitió el refresh token. La política, el client ID y los scopes concedidos deben
+conservarse junto a los tokens:
 
 | Flujo emisor | Política de renovación | Scope observado |
 |---|---|---|
 | ROPC | `B2C_1A_ResourceOwnerv2` | `openid {client_id} offline_access` |
 | Authorization Code + PKCE | `B2C_1A_5ULAIP_PARAMETRIZED_SIGNIN` | `openid offline_access` |
 
+Esta correspondencia no se probó con un refresh token LALIGA real. LaLigaApp
+adquiere por ROPC bajo `ResourceOwnerv2`, pero tiene codificado el refresh
+siempre bajo `5ULAIP_PARAMETRIZED_SIGNIN`; sus pruebas simuladas no demuestran
+que ese cruce funcione. Debe tratarse como una posible deficiencia del cliente,
+no como una excepción confirmada a la regla de Azure B2C.
+
 La comunidad observa unas 24 horas para el access token y hasta 90 días para el
 refresh token, pero deben respetarse `expires_in`, `exp` y los errores reales del
 proveedor en vez de codificar esas duraciones. Si B2C rota el refresh token hay
-que guardar el nuevo de forma atómica. Ante `invalid_grant`, se requiere un nuevo
-login interactivo.
+que guardar el nuevo de forma atómica. Ante `invalid_grant` o `AADB2C90088`, se
+requiere un nuevo login interactivo.
 
 ### Validación y almacenamiento
 
@@ -470,23 +500,35 @@ devolvieron `502`:
 | Método | Ruta histórica | Sustitución/estado |
 |---|---|---|
 | `GET` | `/api/v4/leagues` | `{CMP}/leagues` |
+| `GET` | `/api/v3/leagues` | Versión anterior de la lista de ligas |
+| `GET` | `/api/v4/leagues/{leagueId}/ranking` | `{CMP}/leagues/{leagueId}/standing` |
 | `GET` | `/api/v5/leagues/{leagueId}/ranking` | `{CMP}/leagues/{leagueId}/standing` |
 | `GET` | `/api/v5/leagues/{leagueId}/ranking/{week}` | `{CMP}/leagues/{leagueId}/standing/{week}` |
-| `GET` | `/api/v4/players` o `/api/v5/players` | `{CMP}/players`; datos antiguos congelados |
+| `GET` | `/api/v1/leagues/{leagueId}/standing` | Esquema transicional anterior a `competition/1` |
+| `GET` | `/api/v4/players`, `/api/v5/players` o `/api/v6/players` | `{CMP}/players`; datos antiguos congelados |
+| `GET` | `/api/v3/players/league/{leagueId}` | Catálogo histórico ligado a una liga |
 | `GET` | `/api/v3/leagues/{leagueId}/teams/{teamId}` | Ruta equivalente bajo `{CMP}` |
+| `GET` | `/api/v4/leagues/{leagueId}/teams/{teamId}` | Ruta equivalente bajo `{CMP}` |
 | `GET` | `/api/v3/league/{leagueId}/market` | Ruta equivalente bajo `{CMP}` |
+| `GET` | `/api/v3/league/{leagueId}/market/operations` | Operaciones y puja propia |
+| `GET` | `/api/v3/league/{leagueId}/market/history` | Histórico de operaciones |
 | `GET` | `/api/v5/leagues/{leagueId}/activity[/{page}]` | `{CMP}/leagues/{leagueId}/activity/{page}` |
 | `GET` | `/api/v3/leagues/{leagueId}/news/{page}` | Retirado; usar `activity` |
 | `GET` | `/api/v4/leagues/{leagueId}/news/{page}` | Retirado; usar `activity` |
 | `GET` | `/api/v4/player/{playerId}/league/{leagueId}` | Ruta equivalente bajo `{CMP}` |
 | `GET` | `/api/v3/player/{playerId}/market-value` | `{CMP}/player/{playerId}/market-value` |
+| `GET/PUT` | `/api/v3/teams/{teamId}/lineup` | Ruta equivalente bajo `{CMP}` |
 | `GET` | `/api/v4/teams/{teamId}/lineup/week/{week}` | Ruta equivalente bajo `{CMP}` |
 | `GET` | `/api/v3/teams/{teamId}/money` | Ruta equivalente bajo `{CMP}` |
+| `GET` | `/api/v3/week/current` | `{CMP}/week/current` |
+| `GET` | `/api/v3/calendar?weekNumber={week}` | `{CMP}/calendar?weekNumber={week}` |
 | `GET` | `/api/v3/user/me` | `{API}/v4/user/me` en el host actual |
 | `GET` | `/api/v4/league/{leagueId}/playerTeam/{id}/offer` | Ruta equivalente bajo `{CMP}` |
 | `GET` | `/api/v4/ideal/{week}?formationType=premium` | Sin sustitución confirmada |
 | `POST` | `/api/v3/league/{leagueId}/market/sell` | Ruta equivalente bajo `{CMP}` |
 | `POST` | `/api/v3/league/{leagueId}/market/immediate-sale` | Sin sustitución confirmada |
+| `POST` | `/login/v3/email/auth` | Login intermedio legacy; devolvía `code` |
+| `POST` | `/login/v3/email/token` | Canje legacy de `code` por access token |
 
 No debe confundirse LALIGA Fantasy (`fantasy.laliga.com`) con Fantasy MARCA
 (`fantasy.marca.com`); son productos y backends distintos.
@@ -533,7 +575,10 @@ ruta suficientemente sustentada. Se omiten del catálogo en lugar de adivinarlas
 7. [Microsoft: Authorization Code con PKCE][s11] y
    [escenarios/flujos de autenticación][s12].
 8. [OAuth 2.0 Security Best Current Practice, prohibición de ROPC][s13].
-9. Referencias aportadas: [1][r1], [2][r2], [3][r3], [4][r4], [5][r5] y
+9. [Discovery OIDC de login interactivo][s14] y [ROPC][s15].
+10. [Microsoft: el refresh debe usar el user flow emisor][s16].
+11. [Cliente legacy TypeScript][s17] y [login legacy Clojure][s18].
+12. Referencias aportadas: [1][r1], [2][r2], [3][r3], [4][r4], [5][r5] y
    [`Externoak/LaLigaApp`][r6]. Los posts sirven como contexto de aplicaciones
    comunitarias; el código abierto y las trazas publicadas sustentan los
    contratos concretos.
@@ -551,6 +596,11 @@ ruta suficientemente sustentada. Se omiten del catálogo en lugar de adivinarlas
 [s11]: https://learn.microsoft.com/entra/identity-platform/v2-oauth2-auth-code-flow
 [s12]: https://learn.microsoft.com/entra/identity-platform/authentication-flows-app-scenarios
 [s13]: https://www.rfc-editor.org/rfc/rfc9700.html
+[s14]: https://login.laliga.es/laligadspprob2c.onmicrosoft.com/v2.0/.well-known/openid-configuration?p=B2C_1A_5ULAIP_PARAMETRIZED_SIGNIN
+[s15]: https://login.laliga.es/laligadspprob2c.onmicrosoft.com/v2.0/.well-known/openid-configuration?p=B2C_1A_ResourceOwnerv2
+[s16]: https://learn.microsoft.com/azure/active-directory-b2c/authorization-code-flow#4-refresh-the-token
+[s17]: https://github.com/LixFerox/liga-fantasy-api/blob/047388fbf2fa209226ad389f16b3a2f98c9f9c89/src/lib/api/leagues.ts
+[s18]: https://github.com/carlosgeos/laligafantasy/blob/55a81af5fc7eb1c103db6793c7c6dde3b533ec5d/src/laliga_fantasy/auth.clj
 [r1]: https://www.reddit.com/r/LaLigaFantasy/comments/1w3n7iq/actualizaci%C3%B3n_la_web_para_fichar_en_laliga/
 [r2]: https://www.reddit.com/r/LaLigaFantasy/comments/1waj2id/app_propia_fantasy_tener_ventaja_fantasy/
 [r3]: https://www.reddit.com/r/LaLigaFantasy/comments/1w9vmxr/nueva_app_de_recomendaciones_fantasy_con_ia/
