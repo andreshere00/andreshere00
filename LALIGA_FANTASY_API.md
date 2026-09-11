@@ -550,7 +550,7 @@ ruta suficientemente sustentada. Se omiten del catálogo en lugar de adivinarlas
 [s10]: https://github.com/alxgarci/marca-fantasy-api-scraper-updated/issues/7#issuecomment-2330484036
 [s11]: https://learn.microsoft.com/entra/identity-platform/v2-oauth2-auth-code-flow
 [s12]: https://learn.microsoft.com/entra/identity-platform/authentication-flows-app-scenarios
-[s13]: https://www.rfc-editor.org/rfc/rfc9700.html#name-resource-owner-password-crede
+[s13]: https://www.rfc-editor.org/rfc/rfc9700.html
 [r1]: https://www.reddit.com/r/LaLigaFantasy/comments/1w3n7iq/actualizaci%C3%B3n_la_web_para_fichar_en_laliga/
 [r2]: https://www.reddit.com/r/LaLigaFantasy/comments/1waj2id/app_propia_fantasy_tener_ventaja_fantasy/
 [r3]: https://www.reddit.com/r/LaLigaFantasy/comments/1w9vmxr/nueva_app_de_recomendaciones_fantasy_con_ia/
