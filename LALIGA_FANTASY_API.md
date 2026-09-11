@@ -1,0 +1,515 @@
+# API no oficial de LALIGA Fantasy
+
+> Investigación comunitaria actualizada el **11 de septiembre de 2026**.
+
+## Resumen ejecutivo
+
+LALIGA Fantasy no publica una API para terceros ni un contrato OpenAPI. Existe un
+servicio HTTP usado por sus clientes oficiales, pero es una **API privada y no
+soportada**: puede cambiar sin aviso, no tiene SLA y su uso está sujeto a los
+términos de LALIGA.
+
+La temporada 2026/27 introdujo dos cambios importantes:
+
+```text
+Origen actual:  https://fantasy-api.llt-services.com
+Base API:       https://fantasy-api.llt-services.com/api
+Primera:        /v1/competition/1
+
+Host antiguo:   https://api-fantasy.llt-services.com
+```
+
+El orden de `fantasy-api` es relevante. El host antiguo `api-fantasy` todavía
+puede responder `200`, pero entrega datos congelados de 2025/26 en algunas rutas.
+
+Este documento recoge **todos los endpoints encontrados en fuentes comunitarias
+consultadas**, no todos los que puedan existir internamente. Los niveles usados
+son:
+
+- **Alta**: comprobado sin credenciales el 11-09-2026 o coincidente en dos fuentes
+  comunitarias recientes.
+- **Media**: implementado por una fuente reciente, pero no comprobado aquí con una
+  sesión autenticada.
+- **Baja**: contrato contradictorio, incompleto o únicamente histórico.
+
+## Convenciones
+
+```text
+ORIGIN = https://fantasy-api.llt-services.com
+API    = {ORIGIN}/api
+CMP    = {API}/v1/competition/1
+```
+
+Identificadores:
+
+- `leagueId`: se obtiene de `GET {CMP}/leagues`.
+- `teamId`: aparece en `league.team.id`, el standing o la lista de equipos.
+- `playerId`: identificador maestro de un futbolista.
+- `playerTeamId`: identificador de la ficha de ese futbolista dentro de una
+  plantilla. No siempre es intercambiable con `playerId`.
+- `marketId`, `bidId` y `offerId`: se obtienen de la respuesta de mercado/ofertas.
+- `week`: número de jornada; `page` empieza normalmente en `0`.
+
+Cabeceras observadas:
+
+```http
+Authorization: Bearer <access_token>
+Accept: application/json
+x-lang: es
+x-app: Fantasy-web
+```
+
+`Authorization` solo es necesario en recursos privados. `x-lang` acepta otros
+idiomas en algunos clientes; `x-app` se observa en la web oficial, pero no parece
+imprescindible. Los cuerpos de escritura son JSON y deben usar
+`Content-Type: application/json`.
+
+## Catálogo actual
+
+### Usuario y metadatos
+
+| Método | Endpoint | Autenticación | Resultado | Confianza |
+|---|---|---:|---|---|
+| `GET` | `{API}/v4/user/me` | Sí | Perfil del mánager (`id`, `managerName`, etc.) | Alta |
+| `GET` | `{API}/v5/activity-types` | No | Diccionario de los 33 tipos de actividad | Alta |
+| `GET` | `{API}/v3/teams-master` | No | Equipos de las competiciones disponibles | Alta |
+| `GET` | `{API}/v4/teams/lineup/formations?option=free` | No | Formaciones gratuitas | Alta |
+| `GET` | `{API}/v4/teams/lineup/formations?option=premium` | No | Formaciones premium | Alta |
+| `GET` | `{API}/v4/leagues/premium-configuration` | No | Opciones/configuración premium | Alta |
+
+### Ligas, clasificación y plantillas
+
+| Método | Endpoint | Resultado | Confianza |
+|---|---|---|---|
+| `GET` | `{CMP}/leagues` | Ligas del usuario y resumen de su equipo | Alta |
+| `GET` | `{CMP}/leagues/{leagueId}/standing` | Clasificación general | Alta |
+| `GET` | `{CMP}/leagues/{leagueId}/standing/{week}` | Clasificación de una jornada | Alta |
+| `GET` | `{CMP}/leagues/{leagueId}/activity/{page}` | Actividad paginada de la liga | Alta |
+| `GET` | `{CMP}/leagues/{leagueId}/teams` | Equipos/mánagers de la liga | Media |
+| `GET` | `{CMP}/leagues/{leagueId}/teams/{teamId}` | Plantilla y cláusulas de un equipo | Alta |
+| `GET` | `{CMP}/teams/{teamId}/money` | Caja e inversión del equipo propio | Alta |
+| `GET` | `{CMP}/teams/{teamId}/lineup` | Alineación actual | Alta |
+| `GET` | `{CMP}/teams/{teamId}/lineup/week/{week}` | Alineación de una jornada | Alta |
+| `PUT` | `{CMP}/teams/{teamId}/lineup` | Sustituye la alineación | Alta |
+
+Todas estas rutas requieren bearer. El saldo de equipos rivales puede devolverse
+vacío aunque se conozca su `teamId`.
+
+Cuerpo observado para actualizar el once:
+
+```json
+{
+  "goalkeeper": "player-team-id",
+  "defender": ["id-1", "id-2", "id-3", "id-4"],
+  "midfield": ["id-5", "id-6", "id-7", "id-8"],
+  "striker": ["id-9", "id-10"],
+  "tactical_formation": [4, 4, 2]
+}
+```
+
+Debe contener once IDs únicos y una formación admitida. Las fuentes actuales
+observan `3-4-3`, `3-5-2`, `4-3-3`, `4-4-2`, `4-5-1`, `5-3-2`, `5-4-1`,
+`3-3-4`, `3-6-1`, `4-2-4`, `4-6-0` y `5-2-3`; su disponibilidad depende del
+tipo de liga.
+
+### Jugadores, jornada y calendario
+
+| Método | Endpoint | Autenticación | Resultado | Confianza |
+|---|---|---:|---|---|
+| `GET` | `{CMP}/players` | No | Catálogo completo, estado, valor y puntos | Alta |
+| `GET` | `{CMP}/player/{playerId}/market-value` | No | Histórico de valor de mercado | Alta |
+| `GET` | `{CMP}/player/{playerId}/league/{leagueId}` | Sí | Ficha del jugador contextualizada a una liga | Alta |
+| `GET` | `{CMP}/week/current` | No | Jornada actual y fechas de apertura/cierre | Alta |
+| `GET` | `{CMP}/calendar?weekNumber={week}` | No | Partidos de una jornada | Alta |
+| `GET` | `{ORIGIN}/stats/v1/competition/1/stats/week/{week}` | No | Estadísticas/resultados de la jornada | Alta |
+
+El catálogo devolvió 840 entradas el día de la comprobación. El número cambia
+durante la temporada y no debe utilizarse como validación permanente.
+
+### Mercado y ofertas
+
+Todas las rutas de esta sección requieren bearer.
+
+| Método | Endpoint | Body | Resultado | Confianza |
+|---|---|---|---|---|
+| `GET` | `{CMP}/league/{leagueId}/market` | — | Mercado actual, pujas y ofertas del usuario | Alta |
+| `GET` | `{CMP}/league/{leagueId}/market/history` | — | Histórico del mercado de la liga | Media |
+| `GET` | `{CMP}/league/{leagueId}/playerTeam/{playerTeamId}/offer` | — | Ofertas sobre una ficha propia | Alta |
+| `POST` | `{CMP}/league/{leagueId}/market/{marketId}/bid` | `{"money": 123456}` | Crea una puja | Media |
+| `PUT` | `{CMP}/league/{leagueId}/market/{marketId}/bid/{bidId}` | `{"money": 123456}` | Modifica una puja | Media |
+| `DELETE` | `{CMP}/league/{leagueId}/market/{marketId}/bid/{bidId}/cancel` | — | Cancela una puja | Media |
+| `POST` | `{CMP}/league/{leagueId}/market/sell` | Véase debajo | Publica un jugador | Alta |
+| `DELETE` | `{CMP}/league/{leagueId}/market/{marketId}/delete` | — | Retira un anuncio | Alta |
+| `POST` | `{CMP}/league/{leagueId}/market/{marketId}/offer/{offerId}/accept` | `{"offerMoney": 123456}` | Acepta una oferta | Alta |
+| `POST` | `{CMP}/league/{leagueId}/market/{marketId}/offer/{offerId}/reject` | Sin body | Rechaza una oferta | Alta |
+| `POST` | `{CMP}/league/{leagueId}/market/direct-offer` | Véase debajo | Oferta directa a otro mánager | Media |
+| `DELETE` | `{CMP}/league/{leagueId}/market/{marketId}/offer/{offerId}/cancel` | — | Cancela una oferta | Media |
+
+Publicación:
+
+```json
+{
+  "playerId": "player-team-id",
+  "salePrice": 123456
+}
+```
+
+Oferta directa:
+
+```json
+{
+  "playerId": "player-team-id",
+  "money": 123456
+}
+```
+
+La API usa nombres ambiguos: en varias operaciones el campo se llama `playerId`,
+pero el valor esperado es el ID de la ficha en la plantilla. Debe obtenerse de la
+respuesta del equipo o mercado, no suponerse a partir del ID maestro.
+
+### Cláusulas y blindaje
+
+Todas las rutas requieren bearer.
+
+| Método | Endpoint | Body | Resultado | Confianza |
+|---|---|---|---|---|
+| `POST` | `{CMP}/league/{leagueId}/buyout/{playerTeamId}/pay` | `{"buyoutClauseToPay": 123456}` | Paga la cláusula | Alta |
+| `POST` | `{CMP}/league/{leagueId}/buyout/{playerTeamId}/increase` | `{"buyoutClause": 123456}` | Fija/aumenta la cláusula | Alta |
+| `GET` | `{CMP}/league/{leagueId}/player-team/{playerTeamId}/check-shield` | — | Estado del blindaje | Media |
+| `PUT` | `{CMP}/league/{leagueId}/shield/player` | Véase debajo | Activa el blindaje | Media |
+
+Blindaje observado:
+
+```json
+{
+  "playerId": "player-team-id",
+  "rewardedAdType": "Blindaje",
+  "rewardedAd": 1
+}
+```
+
+Una implementación de julio de 2026 todavía usa esta alternativa para aumentar
+la cláusula:
+
+```http
+PUT {CMP}/league/{leagueId}/buyout/player
+```
+
+```json
+{
+  "factor": 1,
+  "playerId": "player-team-id",
+  "valueToIncrease": 123456
+}
+```
+
+Dos fuentes posteriores coinciden en `POST .../buyout/{id}/increase`, por lo que
+esa es la variante preferida. El contrato alternativo se conserva para explicar
+clientes antiguos, pero su confianza es baja.
+
+## Acceso público y privado comprobado
+
+Se hicieron únicamente peticiones `GET`, sin token y sin acceder a datos de
+ningún usuario:
+
+| Endpoint | Estado el 11-09-2026 |
+|---|---:|
+| `{CMP}/players` | `200` |
+| `{CMP}/player/68/market-value` | `200` |
+| `{API}/v3/teams-master` | `200` |
+| `{API}/v5/activity-types` | `200` |
+| `{API}/v4/teams/lineup/formations?option=free` | `200` |
+| `{API}/v4/teams/lineup/formations?option=premium` | `200` |
+| `{API}/v4/leagues/premium-configuration` | `200` |
+| `{CMP}/week/current` | `200` |
+| `{CMP}/calendar?weekNumber=3` | `200` |
+| `{ORIGIN}/stats/v1/competition/1/stats/week/3` | `200` |
+| `{CMP}/leagues` | `401` |
+| `{API}/v4/user/me` | `401` |
+| `{CMP}/player/68/league/example` | `401` |
+
+Ejemplo público:
+
+```bash
+curl --fail-with-body \
+  'https://fantasy-api.llt-services.com/api/v1/competition/1/players?x-lang=es'
+```
+
+Ejemplo autenticado:
+
+```bash
+curl --fail-with-body \
+  -H "Authorization: Bearer ${LALIGA_ACCESS_TOKEN}" \
+  -H 'Accept: application/json' \
+  -H 'x-lang: es' \
+  'https://fantasy-api.llt-services.com/api/v1/competition/1/leagues'
+```
+
+## Autenticación
+
+El proveedor de identidad observado es Azure AD B2C bajo el dominio de LALIGA:
+
+```text
+OAuth base:
+https://login.laliga.es/laligadspprob2c.onmicrosoft.com/oauth2/v2.0
+
+Cliente nativo observado:
+af88bcff-1157-40a0-b579-030728aacf0b
+
+Callback nativo:
+authredirect://com.lfp.laligafantasy
+```
+
+El client ID es un identificador público, no un secreto. No se ha observado un
+`client_secret` en los clientes nativos.
+
+### Login propio de LALIGA: email y contraseña
+
+Las cuentas locales pueden usar Resource Owner Password Credentials (ROPC):
+
+```http
+POST https://login.laliga.es/laligadspprob2c.onmicrosoft.com/oauth2/v2.0/token
+     ?p=B2C_1A_ResourceOwnerv2
+Content-Type: application/x-www-form-urlencoded
+```
+
+Formulario:
+
+```text
+grant_type=password
+client_id=af88bcff-1157-40a0-b579-030728aacf0b
+scope=openid af88bcff-1157-40a0-b579-030728aacf0b offline_access
+redirect_uri=authredirect://com.lfp.laligafantasy
+username=<email>
+password=<password>
+response_type=id_token
+```
+
+Ejemplo que evita escribir secretos en el comando:
+
+```bash
+read -r -p 'Email: ' LALIGA_EMAIL
+read -r -s -p 'Password: ' LALIGA_PASSWORD
+printf '\n'
+
+curl --fail-with-body \
+  'https://login.laliga.es/laligadspprob2c.onmicrosoft.com/oauth2/v2.0/token?p=B2C_1A_ResourceOwnerv2' \
+  -H 'Content-Type: application/x-www-form-urlencoded' \
+  --data-urlencode 'grant_type=password' \
+  --data-urlencode 'client_id=af88bcff-1157-40a0-b579-030728aacf0b' \
+  --data-urlencode 'scope=openid af88bcff-1157-40a0-b579-030728aacf0b offline_access' \
+  --data-urlencode 'redirect_uri=authredirect://com.lfp.laligafantasy' \
+  --data-urlencode "username=${LALIGA_EMAIL}" \
+  --data-urlencode "password=${LALIGA_PASSWORD}" \
+  --data-urlencode 'response_type=id_token'
+```
+
+La respuesta observada contiene tokens y metadatos como `access_token`,
+`id_token`, `refresh_token`, `token_type` y expiraciones. Debe usarse
+`access_token` como bearer cuando esté presente. Algunos clientes comunitarios
+usan `id_token` como fallback porque ciertas respuestas con scope `openid` no
+incluyen access token; es un comportamiento tolerado observado, no una garantía
+OAuth estándar.
+
+ROPC es un flujo legacy: entrega la contraseña a la aplicación cliente, no
+soporta correctamente MFA ni identidades federadas de Google, Apple o Facebook.
+Solo es razonable en un cliente local y controlado por el propio usuario. Una
+aplicación web debería intercambiar las credenciales desde un backend, descartar
+la contraseña inmediatamente y guardar el token en una cookie `HttpOnly`,
+`Secure` y `SameSite=Strict`, nunca en `localStorage`.
+
+### SSO/social: Authorization Code con PKCE
+
+Google, Apple, Facebook y una sesión LALIGA existente se resuelven mediante la
+página interactiva de Azure B2C. No sirve iniciar sesión directamente con Google
+y enviar su token a Fantasy: el token válido debe ser emitido por el tenant B2C
+de LALIGA.
+
+```mermaid
+sequenceDiagram
+    actor U as Usuario
+    participant C as Cliente local
+    participant B as Azure B2C de LALIGA
+    participant F as API Fantasy
+
+    C->>C: verifier, challenge S256, state y nonce
+    C->>B: GET /authorize + challenge
+    B->>U: Login LALIGA o proveedor social
+    B-->>C: authredirect://...?code=...&state=...
+    C->>C: valida state
+    C->>B: POST /token + code + verifier
+    B-->>C: access/id/refresh tokens
+    C->>F: Authorization: Bearer access_token
+    F-->>C: datos del usuario
+```
+
+1. Crear un `code_verifier` criptográficamente aleatorio, su
+   `code_challenge=BASE64URL(SHA256(verifier))`, un `state` y un `nonce`.
+2. Abrir:
+
+   ```http
+   GET https://login.laliga.es/laligadspprob2c.onmicrosoft.com/oauth2/v2.0/authorize
+   ```
+
+   con estos parámetros:
+
+   | Parámetro | Valor |
+   |---|---|
+   | `p` | `B2C_1A_5ULAIP_PARAMETRIZED_SIGNIN` |
+   | `client_id` | `af88bcff-1157-40a0-b579-030728aacf0b` |
+   | `response_type` | `code` |
+   | `redirect_uri` | `authredirect://com.lfp.laligafantasy` |
+   | `scope` | `openid offline_access` |
+   | `code_challenge` | challenge S256 |
+   | `code_challenge_method` | `S256` |
+   | `state` | valor aleatorio ligado a la sesión |
+   | `nonce` | valor aleatorio ligado a la sesión |
+
+3. Tras el login, capturar el callback, extraer `code` y comprobar que `state`
+   coincide.
+4. Intercambiar el código inmediatamente:
+
+   ```http
+   POST https://login.laliga.es/laligadspprob2c.onmicrosoft.com/oauth2/v2.0/token
+        ?p=B2C_1A_5ULAIP_PARAMETRIZED_SIGNIN
+   Content-Type: application/x-www-form-urlencoded
+
+   grant_type=authorization_code
+   client_id=af88bcff-1157-40a0-b579-030728aacf0b
+   code=<authorization-code>
+   redirect_uri=authredirect://com.lfp.laligafantasy
+   code_verifier=<verifier-original>
+   scope=openid offline_access
+   ```
+
+El código es de un solo uso y dura pocos minutos. El mismo `redirect_uri` debe
+aparecer en autorización e intercambio.
+
+#### Restricción importante para aplicaciones web
+
+Azure B2C solo redirige a URIs registradas por LALIGA. Una web de terceros no
+puede sustituir el callback por `https://mi-web.example/callback` sin que LALIGA
+lo registre. Por eso:
+
+- una aplicación nativa/Electron puede manejar el esquema registrado
+  `authredirect://com.lfp.laligafantasy`;
+- un script de terminal puede pedir al usuario que copie manualmente el callback
+  desde el navegador;
+- una web pública necesita un client/redirect autorizado por LALIGA;
+- un OAuth de Google propio autentica en esa web, pero **no** crea una sesión
+  Fantasy.
+
+Los esquemas personalizados pueden ser reclamados por otra aplicación local. En
+producción es preferible un universal/app link registrado o una integración
+oficial.
+
+### Renovación
+
+```http
+POST https://login.laliga.es/laligadspprob2c.onmicrosoft.com/oauth2/v2.0/token
+     ?p=B2C_1A_5ULAIP_PARAMETRIZED_SIGNIN
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=refresh_token
+refresh_token=<refresh-token>
+client_id=af88bcff-1157-40a0-b579-030728aacf0b
+scope=openid offline_access
+```
+
+La comunidad observa unas 24 horas para el access token y hasta 90 días para el
+refresh token, pero deben respetarse `expires_in`, `exp` y los errores reales del
+proveedor en vez de codificar esas duraciones. Si B2C rota el refresh token hay
+que guardar el nuevo de forma atómica. Ante `invalid_grant`, se requiere un nuevo
+login interactivo.
+
+### Validación y almacenamiento
+
+- Verificar firma, `iss`, `aud`, `exp` y, si aplica, `nonce` usando los metadatos
+  OIDC/JWKS de la política; decodificar un JWT no equivale a validarlo.
+- No registrar passwords, tokens, callbacks con `code`, cookies ni respuestas
+  completas del proveedor.
+- Guardar tokens en el keychain/credential vault del sistema. En backend, usar
+  cookie `HttpOnly`; evitar `localStorage`.
+- No aceptar tokens pegados por otros usuarios ni reutilizar un token entre
+  cuentas.
+- Refrescar poco antes de `exp` y repetir una sola vez después de un `401`.
+- Aplicar rate limiting y backoff ante `429`.
+
+## Endpoints legacy
+
+Estas rutas corresponden al host antiguo
+`https://api-fantasy.llt-services.com`. No deben usarse para 2026/27 aunque
+alguna todavía responda:
+
+| Método | Ruta histórica | Sustitución/estado |
+|---|---|---|
+| `GET` | `/api/v4/leagues` | `{CMP}/leagues` |
+| `GET` | `/api/v5/leagues/{leagueId}/ranking` | `{CMP}/leagues/{leagueId}/standing` |
+| `GET` | `/api/v5/leagues/{leagueId}/ranking/{week}` | `{CMP}/leagues/{leagueId}/standing/{week}` |
+| `GET` | `/api/v4/players` o `/api/v5/players` | `{CMP}/players`; datos antiguos congelados |
+| `GET` | `/api/v3/leagues/{leagueId}/teams/{teamId}` | Ruta equivalente bajo `{CMP}` |
+| `GET` | `/api/v3/league/{leagueId}/market` | Ruta equivalente bajo `{CMP}` |
+| `GET` | `/api/v5/leagues/{leagueId}/activity[/{page}]` | `{CMP}/leagues/{leagueId}/activity/{page}` |
+| `GET` | `/api/v3/leagues/{leagueId}/news/{page}` | Retirado; usar `activity` |
+| `GET` | `/api/v4/leagues/{leagueId}/news/{page}` | Retirado; usar `activity` |
+| `GET` | `/api/v4/player/{playerId}/league/{leagueId}` | Ruta equivalente bajo `{CMP}` |
+| `GET` | `/api/v3/player/{playerId}/market-value` | `{CMP}/player/{playerId}/market-value` |
+| `GET` | `/api/v4/teams/{teamId}/lineup/week/{week}` | Ruta equivalente bajo `{CMP}` |
+| `GET` | `/api/v3/teams/{teamId}/money` | Ruta equivalente bajo `{CMP}` |
+| `GET` | `/api/v3/user/me` | `{API}/v4/user/me` en el host actual |
+| `GET` | `/api/v4/league/{leagueId}/playerTeam/{id}/offer` | Ruta equivalente bajo `{CMP}` |
+| `GET` | `/api/v4/ideal/{week}?formationType=premium` | Sin sustitución confirmada |
+| `POST` | `/api/v3/league/{leagueId}/market/sell` | Ruta equivalente bajo `{CMP}` |
+| `POST` | `/api/v3/league/{leagueId}/market/immediate-sale` | Sin sustitución confirmada |
+
+No debe confundirse LALIGA Fantasy (`fantasy.laliga.com`) con Fantasy MARCA
+(`fantasy.marca.com`); son productos y backends distintos.
+
+## Limitaciones y uso responsable
+
+- No se ejecutaron pujas, ventas, cláusulas, blindajes ni cambios de alineación.
+  Esas llamadas tienen efectos reales e incluso irreversibles.
+- Los parámetros y respuestas no tienen esquema público. Validar tipos en
+  runtime y conservar el status HTTP original.
+- No automatizar acciones agresivas ni intentar eludir anuncios, restricciones,
+  certificate pinning, controles de acceso o límites del servicio.
+- Minimizar caché y concurrencia. Un patrón comunitario usa seis consultas
+  concurrentes y seis horas de caché para históricos.
+- Obtener consentimiento explícito antes de acceder a una cuenta o liga y
+  consultar los [términos de LALIGA Fantasy][s8].
+
+## Fuentes
+
+1. [Migración y endpoints 2026/27, comentario comunitario del 08-08-2026][s1].
+2. [Contrato API 2026/27 de `la-liga-fantasy-analyzer`][s2].
+3. [`Externoak/LaLigaApp`: implementación de endpoints][s3] y
+   [autenticación OAuth/ROPC][s4].
+4. [`jonortega20/fantasybot`: cliente API actual][s5],
+   [configuración OAuth][s6] y [flujo PKCE/refresh][s7].
+5. [Catálogo comunitario 2025/26 y refresh token][s9].
+6. [Ejemplo comunitario de ROPC][s10].
+7. [Microsoft: Authorization Code con PKCE][s11] y
+   [escenarios/flujos de autenticación][s12].
+8. Referencias aportadas: [1][r1], [2][r2], [3][r3], [4][r4], [5][r5] y
+   [`Externoak/LaLigaApp`][r6]. Los posts sirven como contexto de aplicaciones
+   comunitarias; el código abierto y las trazas publicadas sustentan los
+   contratos concretos.
+
+[s1]: https://github.com/alxgarci/marca-fantasy-api-scraper-updated/issues/7#issuecomment-5228161383
+[s2]: https://github.com/sergioalmela/la-liga-fantasy-analyzer/blob/1811a3f9bc887128ef82f6c2eb1e22a8d9d4a384/docs/api-2026-27.md
+[s3]: https://github.com/Externoak/LaLigaApp/blob/d86790a4f2f414c6c43d3891e8696c9b08d236a5/src/services/api.js#L320-L478
+[s4]: https://github.com/Externoak/LaLigaApp/blob/f16ba1b4a1fc30825bd9105a9c5abc0ec2dbd902/src/services/authService.js#L7-L191
+[s5]: https://github.com/jonortega20/fantasybot/blob/31de2bc57a529cfe9e8ea7d2c195b41d8a0f99ec/fantasybot/api.py
+[s6]: https://github.com/jonortega20/fantasybot/blob/31de2bc57a529cfe9e8ea7d2c195b41d8a0f99ec/fantasybot/config.py
+[s7]: https://github.com/jonortega20/fantasybot/blob/8c689be921b7da1386cb8824af319545bec21741/fantasybot/auth.py
+[s8]: https://www.laliga.com/legal/laliga-fantasy
+[s9]: https://github.com/alxgarci/marca-fantasy-api-scraper-updated/issues/7#issuecomment-3389197487
+[s10]: https://github.com/alxgarci/marca-fantasy-api-scraper-updated/issues/7#issuecomment-2330484036
+[s11]: https://learn.microsoft.com/entra/identity-platform/v2-oauth2-auth-code-flow
+[s12]: https://learn.microsoft.com/entra/identity-platform/authentication-flows-app-scenarios
+[r1]: https://www.reddit.com/r/LaLigaFantasy/comments/1w3n7iq/actualizaci%C3%B3n_la_web_para_fichar_en_laliga/
+[r2]: https://www.reddit.com/r/LaLigaFantasy/comments/1waj2id/app_propia_fantasy_tener_ventaja_fantasy/
+[r3]: https://www.reddit.com/r/LaLigaFantasy/comments/1w9vmxr/nueva_app_de_recomendaciones_fantasy_con_ia/
+[r4]: https://www.reddit.com/r/LaLigaFantasy/comments/1w6pd14/hice_una_pagina_para_hacer_ratings_entre_la/
+[r5]: https://www.reddit.com/r/LaLigaFantasy/comments/1w9424n/he_hecho_una_app_android_para_controlar_los/
+[r6]: https://github.com/Externoak/LaLigaApp
