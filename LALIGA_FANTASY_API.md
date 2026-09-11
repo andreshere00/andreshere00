@@ -19,17 +19,18 @@ Primera:        /v1/competition/1
 Host antiguo:   https://api-fantasy.llt-services.com
 ```
 
-El orden de `fantasy-api` es relevante. El host antiguo `api-fantasy` todavía
-puede responder `200`, pero entrega datos congelados de 2025/26 en algunas rutas.
+El orden de `fantasy-api` es relevante. En agosto de 2026 el host antiguo
+`api-fantasy` todavía respondía `200` con datos congelados de 2025/26 en algunas
+rutas; el 11-09-2026 las dos rutas legacy comprobadas devolvieron `502`.
 
 Este documento recoge **todos los endpoints encontrados en fuentes comunitarias
 consultadas**, no todos los que puedan existir internamente. Los niveles usados
 son:
 
-- **Alta**: comprobado sin credenciales el 11-09-2026 o coincidente en dos fuentes
-  comunitarias recientes.
-- **Media**: implementado por una fuente reciente, pero no comprobado aquí con una
-  sesión autenticada.
+- **Alta**: lectura comprobada sin credenciales el 11-09-2026 o coincidente en dos
+  fuentes comunitarias recientes.
+- **Media**: implementado por una fuente reciente o mutación coincidente en varias
+  fuentes, pero no comprobado aquí contra una cuenta real.
 - **Baja**: contrato contradictorio, incompleto o únicamente histórico.
 
 ## Convenciones
@@ -64,7 +65,7 @@ idiomas en algunos clientes; `x-app` se observa en la web oficial, pero no parec
 imprescindible. Los cuerpos de escritura son JSON y deben usar
 `Content-Type: application/json`.
 
-## Catálogo actual
+## Catálogo comunitario actual
 
 ### Usuario y metadatos
 
@@ -90,7 +91,7 @@ imprescindible. Los cuerpos de escritura son JSON y deben usar
 | `GET` | `{CMP}/teams/{teamId}/money` | Caja e inversión del equipo propio | Alta |
 | `GET` | `{CMP}/teams/{teamId}/lineup` | Alineación actual | Alta |
 | `GET` | `{CMP}/teams/{teamId}/lineup/week/{week}` | Alineación de una jornada | Alta |
-| `PUT` | `{CMP}/teams/{teamId}/lineup` | Sustituye la alineación | Alta |
+| `PUT` | `{CMP}/teams/{teamId}/lineup` | Sustituye la alineación | Media |
 
 Todas estas rutas requieren bearer. El saldo de equipos rivales puede devolverse
 vacío aunque se conozca su `teamId`.
@@ -138,10 +139,10 @@ Todas las rutas de esta sección requieren bearer.
 | `POST` | `{CMP}/league/{leagueId}/market/{marketId}/bid` | `{"money": 123456}` | Crea una puja | Media |
 | `PUT` | `{CMP}/league/{leagueId}/market/{marketId}/bid/{bidId}` | `{"money": 123456}` | Modifica una puja | Media |
 | `DELETE` | `{CMP}/league/{leagueId}/market/{marketId}/bid/{bidId}/cancel` | — | Cancela una puja | Media |
-| `POST` | `{CMP}/league/{leagueId}/market/sell` | Véase debajo | Publica un jugador | Alta |
-| `DELETE` | `{CMP}/league/{leagueId}/market/{marketId}/delete` | — | Retira un anuncio | Alta |
-| `POST` | `{CMP}/league/{leagueId}/market/{marketId}/offer/{offerId}/accept` | `{"offerMoney": 123456}` | Acepta una oferta | Alta |
-| `POST` | `{CMP}/league/{leagueId}/market/{marketId}/offer/{offerId}/reject` | Sin body | Rechaza una oferta | Alta |
+| `POST` | `{CMP}/league/{leagueId}/market/sell` | Véase debajo | Publica un jugador | Media |
+| `DELETE` | `{CMP}/league/{leagueId}/market/{marketId}/delete` | — | Retira un anuncio | Media |
+| `POST` | `{CMP}/league/{leagueId}/market/{marketId}/offer/{offerId}/accept` | `{"offerMoney": 123456}` | Acepta una oferta | Media |
+| `POST` | `{CMP}/league/{leagueId}/market/{marketId}/offer/{offerId}/reject` | Sin body | Rechaza una oferta | Media |
 | `POST` | `{CMP}/league/{leagueId}/market/direct-offer` | Véase debajo | Oferta directa a otro mánager | Media |
 | `DELETE` | `{CMP}/league/{leagueId}/market/{marketId}/offer/{offerId}/cancel` | — | Cancela una oferta | Media |
 
@@ -173,8 +174,8 @@ Todas las rutas requieren bearer.
 
 | Método | Endpoint | Body | Resultado | Confianza |
 |---|---|---|---|---|
-| `POST` | `{CMP}/league/{leagueId}/buyout/{playerTeamId}/pay` | `{"buyoutClauseToPay": 123456}` | Paga la cláusula | Alta |
-| `POST` | `{CMP}/league/{leagueId}/buyout/{playerTeamId}/increase` | `{"buyoutClause": 123456}` | Fija/aumenta la cláusula | Alta |
+| `POST` | `{CMP}/league/{leagueId}/buyout/{playerTeamId}/pay` | `{"buyoutClauseToPay": 123456}` | Paga la cláusula | Media |
+| `POST` | `{CMP}/league/{leagueId}/buyout/{playerTeamId}/increase` | `{"buyoutClause": 123456}` | Fija/aumenta la cláusula | Media |
 | `GET` | `{CMP}/league/{leagueId}/player-team/{playerTeamId}/check-shield` | — | Estado del blindaje | Media |
 | `PUT` | `{CMP}/league/{leagueId}/shield/player` | Véase debajo | Activa el blindaje | Media |
 
@@ -313,10 +314,13 @@ OAuth estándar.
 
 ROPC es un flujo legacy: entrega la contraseña a la aplicación cliente, no
 soporta correctamente MFA ni identidades federadas de Google, Apple o Facebook.
-Solo es razonable en un cliente local y controlado por el propio usuario. Una
-aplicación web debería intercambiar las credenciales desde un backend, descartar
-la contraseña inmediatamente y guardar el token en una cookie `HttpOnly`,
-`Secure` y `SameSite=Strict`, nunca en `localStorage`.
+El estándar de seguridad OAuth 2.0 vigente indica que **no debe utilizarse** en
+nuevos diseños. Se incluye para describir el cliente observado, no como
+recomendación. Una web de terceros no debería mostrar un formulario que recoja
+credenciales de LALIGA; la solución correcta es una integración Authorization
+Code + PKCE cuyo cliente y callback haya registrado LALIGA. Si se reproduce ROPC
+para diagnóstico de la cuenta propia, debe hacerse localmente, sin persistir la
+contraseña ni enviarla a infraestructura de terceros.
 
 ### SSO/social: Authorization Code con PKCE
 
@@ -338,8 +342,8 @@ sequenceDiagram
     B-->>C: authredirect://...?code=...&state=...
     C->>C: valida state
     C->>B: POST /token + code + verifier
-    B-->>C: access/id/refresh tokens
-    C->>F: Authorization: Bearer access_token
+    B-->>C: id_token, refresh_token y quizá access_token
+    C->>F: Authorization: Bearer token emitido por B2C
     F-->>C: datos del usuario
 ```
 
@@ -385,6 +389,14 @@ sequenceDiagram
 El código es de un solo uso y dura pocos minutos. El mismo `redirect_uri` debe
 aparecer en autorización e intercambio.
 
+El scope PKCE observado, `openid offline_access`, no identifica un recurso API y
+normalmente solicita identidad y renovación, no un access token OAuth para
+Fantasy. Los clientes comunitarios actuales contemplan recibir solo `id_token`,
+y el backend Fantasy lo acepta como bearer. Es una particularidad no estándar.
+No se ha localizado un scope público y documentado del recurso Fantasy; no debe
+inventarse uno. Si la respuesta incluye `access_token`, se prefiere este; si solo
+incluye `id_token`, la compatibilidad depende del comportamiento privado actual.
+
 #### Restricción importante para aplicaciones web
 
 Azure B2C solo redirige a URIs registradas por LALIGA. Una web de terceros no
@@ -407,14 +419,21 @@ oficial.
 
 ```http
 POST https://login.laliga.es/laligadspprob2c.onmicrosoft.com/oauth2/v2.0/token
-     ?p=B2C_1A_5ULAIP_PARAMETRIZED_SIGNIN
+     ?p=<POLITICA_QUE_EMITIO_EL_REFRESH_TOKEN>
 Content-Type: application/x-www-form-urlencoded
 
 grant_type=refresh_token
 refresh_token=<refresh-token>
 client_id=af88bcff-1157-40a0-b579-030728aacf0b
-scope=openid offline_access
+scope=<EL_MISMO_SCOPE_DEL_LOGIN>
 ```
+
+La política debe conservarse junto a los tokens:
+
+| Flujo emisor | Política de renovación | Scope observado |
+|---|---|---|
+| ROPC | `B2C_1A_ResourceOwnerv2` | `openid {client_id} offline_access` |
+| Authorization Code + PKCE | `B2C_1A_5ULAIP_PARAMETRIZED_SIGNIN` | `openid offline_access` |
 
 La comunidad observa unas 24 horas para el access token y hasta 90 días para el
 refresh token, pero deben respetarse `expires_in`, `exp` y los errores reales del
@@ -424,8 +443,14 @@ login interactivo.
 
 ### Validación y almacenamiento
 
-- Verificar firma, `iss`, `aud`, `exp` y, si aplica, `nonce` usando los metadatos
-  OIDC/JWKS de la política; decodificar un JWT no equivale a validarlo.
+- Un cliente que solo reenvía un access token a Fantasy debe tratarlo como opaco;
+  la API de recursos es responsable de validarlo.
+- Si la aplicación usa el ID token para crear su propia sesión, debe validar
+  firma, `iss`, `aud`, `exp`, `nonce` y `state` con los metadatos OIDC/JWKS de la
+  política. Decodificar un JWT no equivale a validarlo.
+- Un BFF que acepte tokens aportados por el navegador debe validarlos antes de
+  confiar en su identidad y limitar su cookie a `HttpOnly`, `Secure` y
+  `SameSite=Strict`.
 - No registrar passwords, tokens, callbacks con `code`, cookies ni respuestas
   completas del proveedor.
 - Guardar tokens en el keychain/credential vault del sistema. En backend, usar
@@ -438,8 +463,9 @@ login interactivo.
 ## Endpoints legacy
 
 Estas rutas corresponden al host antiguo
-`https://api-fantasy.llt-services.com`. No deben usarse para 2026/27 aunque
-alguna todavía responda:
+`https://api-fantasy.llt-services.com`. No deben usarse para 2026/27. Algunas
+respondían con datos congelados en agosto; las comprobadas el 11-09-2026
+devolvieron `502`:
 
 | Método | Ruta histórica | Sustitución/estado |
 |---|---|---|
@@ -465,6 +491,20 @@ alguna todavía responda:
 No debe confundirse LALIGA Fantasy (`fantasy.laliga.com`) con Fantasy MARCA
 (`fantasy.marca.com`); son productos y backends distintos.
 
+### Funciones sin endpoint comunitario confirmado
+
+El producto actual también ofrece funciones para las que no se encontró una
+ruta suficientemente sustentada. Se omiten del catálogo en lugar de adivinarlas:
+
+| Área funcional | Estado de la investigación |
+|---|---|
+| Crear, unir, abandonar o administrar ligas | Sin contrato actual confirmado |
+| Invitaciones y códigos de liga | Sin contrato actual confirmado |
+| Capitán, banquillo y entrenador | Función visible; ruta no confirmada |
+| Recompensa diaria y anuncios recompensados | Función visible; ruta no confirmada |
+| Eventos y modos especiales | Sin contrato actual confirmado |
+| Suscripción/pago premium | Configuración legible; mutaciones no confirmadas |
+
 ## Limitaciones y uso responsable
 
 - No se ejecutaron pujas, ventas, cláusulas, blindajes ni cambios de alineación.
@@ -477,6 +517,8 @@ No debe confundirse LALIGA Fantasy (`fantasy.laliga.com`) con Fantasy MARCA
   concurrentes y seis horas de caché para históricos.
 - Obtener consentimiento explícito antes de acceder a una cuenta o liga y
   consultar los [términos de LALIGA Fantasy][s8].
+- Las condiciones restringen la explotación o copia no autorizada del contenido
+  y las acciones fraudulentas o contrarias al funcionamiento normal del juego.
 
 ## Fuentes
 
@@ -490,7 +532,8 @@ No debe confundirse LALIGA Fantasy (`fantasy.laliga.com`) con Fantasy MARCA
 6. [Ejemplo comunitario de ROPC][s10].
 7. [Microsoft: Authorization Code con PKCE][s11] y
    [escenarios/flujos de autenticación][s12].
-8. Referencias aportadas: [1][r1], [2][r2], [3][r3], [4][r4], [5][r5] y
+8. [OAuth 2.0 Security Best Current Practice, prohibición de ROPC][s13].
+9. Referencias aportadas: [1][r1], [2][r2], [3][r3], [4][r4], [5][r5] y
    [`Externoak/LaLigaApp`][r6]. Los posts sirven como contexto de aplicaciones
    comunitarias; el código abierto y las trazas publicadas sustentan los
    contratos concretos.
@@ -502,11 +545,12 @@ No debe confundirse LALIGA Fantasy (`fantasy.laliga.com`) con Fantasy MARCA
 [s5]: https://github.com/jonortega20/fantasybot/blob/31de2bc57a529cfe9e8ea7d2c195b41d8a0f99ec/fantasybot/api.py
 [s6]: https://github.com/jonortega20/fantasybot/blob/31de2bc57a529cfe9e8ea7d2c195b41d8a0f99ec/fantasybot/config.py
 [s7]: https://github.com/jonortega20/fantasybot/blob/8c689be921b7da1386cb8824af319545bec21741/fantasybot/auth.py
-[s8]: https://www.laliga.com/legal/laliga-fantasy
+[s8]: https://www.laliga.com/informacion-legal/condiciones-de-uso-fantasy
 [s9]: https://github.com/alxgarci/marca-fantasy-api-scraper-updated/issues/7#issuecomment-3389197487
 [s10]: https://github.com/alxgarci/marca-fantasy-api-scraper-updated/issues/7#issuecomment-2330484036
 [s11]: https://learn.microsoft.com/entra/identity-platform/v2-oauth2-auth-code-flow
 [s12]: https://learn.microsoft.com/entra/identity-platform/authentication-flows-app-scenarios
+[s13]: https://www.rfc-editor.org/rfc/rfc9700.html#name-resource-owner-password-crede
 [r1]: https://www.reddit.com/r/LaLigaFantasy/comments/1w3n7iq/actualizaci%C3%B3n_la_web_para_fichar_en_laliga/
 [r2]: https://www.reddit.com/r/LaLigaFantasy/comments/1waj2id/app_propia_fantasy_tener_ventaja_fantasy/
 [r3]: https://www.reddit.com/r/LaLigaFantasy/comments/1w9vmxr/nueva_app_de_recomendaciones_fantasy_con_ia/
