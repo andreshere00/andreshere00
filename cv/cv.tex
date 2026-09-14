@@ -1,0 +1,309 @@
+\documentclass[11pt]{article} 
+
+% Remove default section styles as before
+\renewcommand{\section}[1]{}
+\renewcommand{\subsection}[1]{}
+
+% Packages (keep or adjust your package list as needed)
+\usepackage{wasysym}
+\usepackage{amssymb}
+\usepackage{eurosym} % for \euro
+\usepackage[utf8]{inputenc}  
+\usepackage{xstring, xifthen}
+\usepackage[english]{babel}
+% \usepackage[light]{roboto}
+\usepackage[default,scale=1]{sourcesanspro}
+% \usepackage[defaultsans,scale=0.93]{opensans}
+\usepackage[T1]{fontenc}
+\usepackage{moresize}
+\usepackage{twemojis}
+\usepackage{fontawesome5}
+\usepackage{graphicx}
+\usepackage{tikz}    
+\usetikzlibrary{shapes, backgrounds, mindmap, trees}
+\usepackage{transparent}
+\usepackage{color}
+\usepackage{xhfill}
+\usepackage[hidelinks]{hyperref}
+\usepackage[a4paper]{geometry}
+\geometry{top=1cm, bottom=1.5cm, left=1.5cm, right=1.5cm, footskip=1cm}
+\usepackage{enumitem}
+\pagenumbering{gobble}
+
+\setlist[itemize]{nosep}
+
+% Define a dummy \contentReference command if not defined elsewhere
+\newcommand{\contentReference}[2][]{}
+\renewcommand{\familydefault}{\sfdefault}
+
+% Define colors (Paleta de tres colores)
+\definecolor{primary}{HTML}{010259}    % Primario
+\definecolor{secondary}{HTML}{232F3E}    % Secundario
+\definecolor{terciary}{HTML}{007EB9}   % Terciario
+\definecolor{black}{HTML}{000000}      % Texto normal
+
+% Commands for centered minipage content
+\newcommand*{\vcenteredhbox}[1]{%
+  \begingroup
+  \setbox0=\hbox{#1}%
+  \parbox{\wd0}{\box0}\endgroup}
+
+% ICON definitions (keep your original definitions)
+\newcommand{\icon}[3]{        
+ \makebox(#2,#2){\textcolor{primary}{\faIcon{#1}}}
+} 
+
+\newcommand{\icontext}[4]{       
+ \vcenteredhbox{\icon{#1}{#2}{#3}}  \hspace{2pt}  \parbox{0.9\mpwidth}{\textcolor{#4}{#3}}
+}
+\newcommand{\iconemail}[5]{       
+    \vcenteredhbox{\icon{#1}{#2}{#5}}  \hspace{2pt} \href{mailto:#4}{\textcolor{#5}{#3}}
+}
+\newcommand{\iconhref}[5]{ 						
+    \vcenteredhbox{\icon{#1}{#2}{#5}}  \hspace{2pt} \href{#4}{\textcolor{#5}{#3}}
+}
+
+% Width for boxes
+\newcommand{\mpwidth}{\linewidth-\fboxsep-\fboxsep}
+
+%-------------------%
+% CV Formatting Macros
+%-------------------%
+
+% Minimal CV text block
+\newcommand{\cvtext}[1]{%
+ \begin{tabular*}{1\mpwidth}{p{\mpwidth}}
+  \parbox{1\mpwidth}{#1}
+ \end{tabular*}%
+}
+
+% CV Section header
+\newcommand{\cvsection}[1]{%
+ \vspace{14pt}
+ \cvtext{%
+  \textbf{\Large{\textcolor{primary}{\uppercase{#1}}}}\\[2pt]
+ }%
+}
+
+% CV event (work/education entry); additional info in bullet list
+\newcommand{\cvevent}[7]{%
+ \parbox{\mpwidth}{%
+  \begin{tabular*}{1\mpwidth}{p{0.78\mpwidth}  r}
+    \textcolor{black}{#2} \xrfill[.5ex]{2pt}[terciary] & \textcolor{secondary}{#1} \\
+    \textcolor{secondary}{\textit{#3}} & \\
+  \end{tabular*}\\[5pt] 
+  \ifthenelse{\isempty{#4}}{}{%
+   \cvtext{#4}\\%
+  }%
+ }%
+ \ifthenelse{\isempty{#5}}{}{%
+  \vspace{9pt}%
+  \cvtext{#5}%
+ }%
+ \ifthenelse{\isempty{#6}}{}{%
+  \vspace{9pt}%
+  \cvtext{#6}%
+ }%
+ \ifthenelse{\isempty{#7}}{}{%
+  \vspace{9pt}%
+  \cvtext{#7}%
+ }%
+}
+
+% Footer with last update (adjust as needed)
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyfoot[L]{\small \textcolor{black!20!terciary}{Last Updated on \textbf{\today}. More information on my \href{https://www.linkedin.com/in/andres-herencia/}{\textbf{LinkedIn}}}\textcolor{white}{Phone: +34608325729; Email: andresherencia2000@gmail.com; Location: Madrid, España}}
+% \fancyfoot[R]{\small \includegraphics[width=20pt]{logo-andres.png}}
+\renewcommand{\headrulewidth}{0pt}
+
+\setlength{\parindent}{0mm}
+
+\begin{document}
+
+%-------------------%
+% HEADER and COMPACT CONTACT BLOCK
+%-------------------%
+\noindent\begin{tikzpicture}
+\node[
+  rectangle,
+  inner sep=10pt,
+  minimum width=\linewidth,
+  text width=\linewidth,
+  align=center,
+  outer sep=0pt,
+  path picture={%
+    \shade[left color=primary, right color=primary!70!terciary]
+      (path picture bounding box.south west)
+      rectangle (path picture bounding box.north east);%
+  }
+]{%
+\begin{minipage}[c]{\linewidth}
+    \begin{center}
+         \Huge{\textbf{\textcolor{white}{\uppercase{Andrés Herencia}}}}\\[8pt]
+         \normalsize{\textcolor{white}{\textbf{Forward Deployed AI Engineer} | 2 x AWS-Certified | + 3 years designing \& building AI-driven products}} \\[8pt]
+         \small{\textcolor{white}{%
+             \faMapMarker*~ \href{https://maps.app.goo.gl/QnwKxmFKUzQpsAaU6}{\textcolor{white}{Madrid, Spain}} \quad | \quad
+             \faEnvelope~ \href{mailto:andresherencia2000@gmail.com}{\textcolor{white}{andresherencia2000}} \quad | \quad
+             \faPhone~ \href{tel:+34608325729}{\textcolor{white}{+34608325729}} \quad | \quad
+             \faLinkedin~ \href{https://www.linkedin.com/in/andres-herencia/}{\textcolor{white}{LinkedIn}} \quad | \quad
+             \faGithub~ \href{https://github.com/andreshere00}{\textcolor{white}{GitHub}}%
+         }}
+         \\[4pt]
+    \end{center}
+\end{minipage}%
+};
+\end{tikzpicture}
+
+\vspace{4pt}
+
+%\begin{center}
+   %\textbf{Machine Learning Engineer} with 3+ years of experience building scalable AI solutions using LLMs, RAG systems, and AWS Cloud. Proven track record in banking, mobility, and academia. 
+%\end{center}
+
+\vspace{-0.5em}
+
+%-------------------%
+% WORK EXPERIENCE
+%-------------------%
+\section{Work Experience}
+\cvsection{Experience}
+
+\vspace{-1em}
+
+\cvevent
+{02/2026 -- Current}
+{\textbf{Forward Deployed AI Engineer}}
+{\textcolor{terciary}{\faMapMarker*}~ {\textcolor{terciary}{\href{https://www.inno-it.es/}{{InnoIT}} | Working for one of the "Big Three" credit reporting agencies.}}}
+{
+\vspace{-0.5em}
+\begin{itemize}
+    \item Design and build \textbf{agentic tools} in TypeScript using \textbf{skills} and \textbf{MCP servers}.
+    \item Developed an \textbf{event-driven architecture on AWS} to generate EWS reports, reducing delivery time from 4-5 days to \textbf{under 10 minutes}.
+    \item Lead internal use cases for \textbf{consulting engagements}; Support role profiling via \textbf{technical interviews}.
+\end{itemize}
+}{}{}{}
+
+\vspace{0.5em}
+
+\cvevent
+{09/2024 -- 02/2026}
+{\textbf{Machine Learning Engineer}}
+{\textcolor{terciary}{\faMapMarker*}~ {\textcolor{terciary}{\href{https://www.minsait.com/en}{{Minsait}} @ \href{https://www.bbva.com/}{{BBVA}}}}}
+{%
+\vspace{-0.5em}
+\begin{itemize}
+\item Developed a serverless \textbf{GenAI-based application} to automate claims classification process, reaching \textbf{98\% accuracy} and cutting complaint-mail triage from hours to \textbf{under 3 minutes}.
+\item Led planning and delivery for internal Minsait projects: \textbf{BigRAG} (MS Azure) and \textbf{LLM Evaluator}.
+\end{itemize}
+}{}{}{}
+
+\vspace{0.5em}
+
+\cvevent
+{02/2024 -- 09/2024}
+{\textbf{DevOps \& MLOps Engineer}}
+{\textcolor{terciary}{\faMapMarker*}~ {\textcolor{terciary}{\href{https://the-cliff.com/es/inicio/}{{The Cliff}}}}}
+{%
+\vspace{-0.5em}
+\begin{itemize}
+    \item Scaled and automated AWS cloud infrastructure, with \textbf{CI/CD} pipelines to deploy microservices.
+    \item Improved \textbf{LLM} performance and observability by delivering \textbf{MLOps} workflows for \textbf{RAG} systems.
+\end{itemize}
+}{}{}{}
+
+\cvevent
+{12/2021 -- 04/2023}
+{\textbf{Big Data \& Data Science Researcher}}
+{}
+{%
+\vspace{-1.75em}
+\textcolor{terciary}{\faMapMarker*}~ {\textcolor{terciary}{\href{https://sunrise-europe.eu/}{SUNRISE European project}}} (\textit{Part-time})
+\begin{itemize}
+    \item Built and trained a logistic \textbf{optimization model} for the \href{https://www.crtm.es/}{CRTM} transport network.
+    \item Performed geospatial data analysis using the \textbf{\href{https://developers.google.com/earth-engine/reference/rest}{Google Earth API}} and \textbf{PySpark}.
+\end{itemize}
+\textcolor{terciary}{\faMapMarker*}~ {\textcolor{terciary}{\href{https://cabify.com/en}{Cabify Chair}}} (\textit{Internship})
+\begin{itemize}
+    \item Developed statistical models for a \textbf{mobility simulation platform} actively used by the company.
+    \item Presented this work as part of my \textbf{\href{https://www.linkedin.com/feed/update/urn:li:activity:6952264221422174208/}{Bachelor's Thesis}}, awarded the maximum grade [\textbf{10/10}].
+\end{itemize}
+}{}{}{}
+
+%-------------------%
+% EDUCATION
+%-------------------%
+\vspace{-0.5em}
+
+\section{Education}
+\cvsection{Education}
+
+\vspace{-0.5em}
+
+\cvevent
+{09/2023 -- 06/2024}
+{\href{https://www.ucm.es/data/cont/docs/titulaciones/442.pdf}{\textcolor{black}{\textbf{Master's Degree in Statistical \& Computational Data Science} [9/10]}}}
+{Universidad Complutense de Madrid \& Universidad Politécnica de Madrid}
+{%
+\vspace{-1em}
+→ \textbf{Thesis}: \href{https://docta.ucm.es/rest/api/core/bitstreams/30effe66-9f5a-404e-9b31-ba3e8d555268/content}{Analysis of the Transformer architecture and foundation model \textit{fine-tuning} using QLoRA} [9.8/10]
+}{}{}{}
+
+\vspace{-1em}
+
+\cvevent
+{09/2018 -- 07/2022}
+{\href{https://www.etsit.upm.es/de/studies/bachelor-of-engineering-in-telecommunication-technologies-and-services/syllabus-and-schedules/subjects.html}{\textcolor{black}{\textbf{Bachelor's Degree in Telecommunication Engineering}}}}
+{Universidad Politécnica de Madrid}
+{
+}{}{}{}
+
+\vspace{-1em}
+
+%-------------------%
+% CERTIFICATIONS
+%-------------------%
+\section{Certifications}
+\cvsection{Certifications}
+
+\vspace{-0.5em}
+
+\cvevent
+{04/2025 -- 04/2028}
+{\href{https://www.credly.com/badges/6f0a5952-ad44-4b76-b609-ac3ae21466a1/public_url}{{\textbf{AWS Certified Solutions Architect – Associate}}} (\checkmark)}
+{}
+{}{}{}{}
+
+\vspace{-2em}
+
+\cvevent
+{11/2025 -- 11/2028}
+{\href{https://www.credly.com/badges/94609834-c001-4dec-b8aa-c07957444f1e/public_url}{{\textbf{AWS Certified Machine Learning Engineer – Associate}}} (\checkmark)}
+{}
+{}{}{}{}
+
+\vspace{-2em}
+
+\section{Projects}
+\cvsection{projects}
+
+\vspace{-0.5em} 
+
+\hspace{0.5em}\parbox{\dimexpr\linewidth}{
+\href{https://github.com/andreshere00/Splitter_MR/}{\textbf{SplitterMR}} (+25 \twemoji{star} on GH): A Python \href{https://pypi.org/project/splitter-mr/}{library} to ingest \& transform documents into markdown chunks. \vspace{0.5em} \\
+% → \href{https://github.com/andreshere00/aws_cli_mcp}{\textbf{AWS MCP CLI:}} An LLM-powered agent to execute AWS instructions using queries in natural language. \\
+%\textbf{\href{https://github.com/andreshere00/GenAI-app-template}{GenAI Application template:}} A cookiecutter template for building LLM-based applications in Python. \vspace{0.5em} \\
+\textbf{PPTX Generator:} An e2e GenAI MVP that turns NLP prompts and user media into editable PowerPoint decks. \vspace{0.5em} \\
+\textbf{BigRAG:} A hybrid search-powered RAG system deployed on Microsoft Azure for large databases.\vspace{1em}
+}
+
+\vspace{-1em}
+
+\section{Languages}
+\cvsection{Languages}
+
+\vspace{-0.5em}
+
+\hspace{0.5em} \textbf{Spanish} (\textit{native}), \textbf{English} (\textit{full work proficiency}) \& \textbf{Italian} (\textit{limited work proficiency}).
+
+\end{document}
