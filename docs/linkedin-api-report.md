@@ -1,6 +1,6 @@
 # Informe técnico: APIs de LinkedIn y acceso a datos de perfil
 
-**Fecha de revisión:** 14 de septiembre de 2026  
+**Fecha de revisión:** 14 de septiembre de 2026
 **Fuentes:** documentación oficial de LinkedIn y Microsoft Learn
 
 ## 1. Resumen ejecutivo
