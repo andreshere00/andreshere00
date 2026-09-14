@@ -26,7 +26,7 @@
 \usepackage{xhfill}
 \usepackage[hidelinks]{hyperref}
 \usepackage[a4paper]{geometry}
-\geometry{top=1cm, bottom=1.5cm, left=1.5cm, right=1.5cm, footskip=1cm}
+\geometry{top=1cm, bottom=1.2cm, left=1.5cm, right=1.5cm, footskip=0.85cm}
 \usepackage{enumitem}
 \pagenumbering{gobble}
 
@@ -79,7 +79,7 @@
 
 % CV Section header
 \newcommand{\cvsection}[1]{%
- \vspace{14pt}
+ \vspace{8pt}
  \cvtext{%
   \textbf{\Large{\textcolor{primary}{\uppercase{#1}}}}\\[2pt]
  }%
@@ -174,17 +174,17 @@
 \cvevent
 {02/2026 -- Current}
 {\textbf{Forward Deployed AI Engineer}}
-{\textcolor{terciary}{\faMapMarker*}~ {\textcolor{terciary}{\href{https://www.inno-it.es/}{{InnoIT}} | Working for one of the "Big Three" credit reporting agencies.}}}
+{\textcolor{terciary}{\faMapMarker*}~ {\textcolor{terciary}{\href{https://www.inno-it.es/}{{InnoIT}} @ \href{https://www.moodys.com/}{{Moody's}}}}}
 {
 \vspace{-0.5em}
 \begin{itemize}
-    \item Design and build \textbf{agentic tools} in TypeScript using \textbf{skills} and \textbf{MCP servers}.
+    \item Design and build \textbf{agentic tools} and an \textbf{HMAS} in TypeScript using \textbf{skills} and \textbf{MCP servers}.
     \item Developed an \textbf{event-driven architecture on AWS} to generate EWS reports, reducing delivery time from 4-5 days to \textbf{under 10 minutes}.
     \item Lead internal use cases for \textbf{consulting engagements}; Support role profiling via \textbf{technical interviews}.
 \end{itemize}
 }{}{}{}
 
-\vspace{0.5em}
+\vspace{0.2em}
 
 \cvevent
 {09/2024 -- 02/2026}
@@ -193,12 +193,12 @@
 {%
 \vspace{-0.5em}
 \begin{itemize}
-\item Developed a serverless \textbf{GenAI-based application} to automate claims classification process, reaching \textbf{98\% accuracy} and cutting complaint-mail triage from hours to \textbf{under 3 minutes}.
+\item Developed a serverless \textbf{GenAI} claims classifier: \textbf{98\% accuracy}, triage in \textbf{under 3 minutes}, \textbf{\textless\,\euro0.50}/email.
 \item Led planning and delivery for internal Minsait projects: \textbf{BigRAG} (MS Azure) and \textbf{LLM Evaluator}.
 \end{itemize}
 }{}{}{}
 
-\vspace{0.5em}
+\vspace{0.2em}
 
 \cvevent
 {02/2024 -- 09/2024}
@@ -207,8 +207,8 @@
 {%
 \vspace{-0.5em}
 \begin{itemize}
-    \item Scaled and automated AWS cloud infrastructure, with \textbf{CI/CD} pipelines to deploy microservices.
-    \item Improved \textbf{LLM} performance and observability by delivering \textbf{MLOps} workflows for \textbf{RAG} systems.
+    \item Scaled AWS infrastructure (\textbf{ECS}, \textbf{EKS}, EC2) with \textbf{GitLab CI/CD} to deploy microservices.
+    \item Improved \textbf{LLM} observability with \textbf{Langfuse} and \textbf{MLOps} workflows for \textbf{RAG} (\textbf{Qdrant}).
 \end{itemize}
 }{}{}{}
 
@@ -284,26 +284,34 @@
 
 \vspace{-2em}
 
+\hspace{0.5em} Also: \textbf{Software Architecture Patterns \& System Design} (2026) · \textbf{Agents \& MCP} (2025).
+
+\vspace{-0.2em}
+
 \section{Projects}
 \cvsection{projects}
 
-\vspace{-0.5em} 
+\vspace{-0.5em}
 
 \hspace{0.5em}\parbox{\dimexpr\linewidth}{
-\href{https://github.com/andreshere00/Splitter_MR/}{\textbf{SplitterMR}} (+25 \twemoji{star} on GH): A Python \href{https://pypi.org/project/splitter-mr/}{library} to ingest \& transform documents into markdown chunks. \vspace{0.5em} \\
-% → \href{https://github.com/andreshere00/aws_cli_mcp}{\textbf{AWS MCP CLI:}} An LLM-powered agent to execute AWS instructions using queries in natural language. \\
-%\textbf{\href{https://github.com/andreshere00/GenAI-app-template}{GenAI Application template:}} A cookiecutter template for building LLM-based applications in Python. \vspace{0.5em} \\
-\textbf{PPTX Generator:} An e2e GenAI MVP that turns NLP prompts and user media into editable PowerPoint decks. \vspace{0.5em} \\
-\textbf{BigRAG:} A hybrid search-powered RAG system deployed on Microsoft Azure for large databases.\vspace{1em}
+\href{https://github.com/andreshere00/Splitter_MR/}{\textbf{SplitterMR}} (+25 \twemoji{star} on GH): Python \href{https://pypi.org/project/splitter-mr/}{library} to ingest documents into markdown chunks; used internally at Minsait. \vspace{0.3em} \\
+\textbf{PresentIA:} GenAI MVP that turns prompts and media into editable PowerPoint decks. \vspace{0.25em} \\
+\href{https://github.com/andreshere00/aws_cli_mcp}{\textbf{AWS MCP CLI:}} LLM-powered agent to run AWS instructions from natural language.
 }
-
-\vspace{-1em}
-
-\section{Languages}
-\cvsection{Languages}
 
 \vspace{-0.5em}
 
-\hspace{0.5em} \textbf{Spanish} (\textit{native}), \textbf{English} (\textit{full work proficiency}) \& \textbf{Italian} (\textit{limited work proficiency}).
+\section{Skills}
+\cvsection{Skills}
+
+\vspace{-0.5em}
+
+\hspace{0.5em}\parbox{\dimexpr\linewidth}{
+\textbf{AI/ML:} LLMs, RAG, Agents \& MCP, MLOps, Deep Learning, Statistical modelling \\[0.2em]
+\textbf{Software:} Python, TypeScript, FastAPI, React, LangChain, Langfuse, Git \\[0.2em]
+\textbf{Cloud:} AWS (Lambda, S3, ECS, OpenSearch), Azure, Terraform, Docker, CI/CD \\[0.2em]
+\textbf{Languages:} Spanish (\textit{C2, native}), English (\textit{C1}), Italian (\textit{limited work proficiency}) \\[0.2em]
+\textbf{Conferences:} AWS Summit Madrid 2026 · Applied AI beyond the hype (2026)
+}
 
 \end{document}
