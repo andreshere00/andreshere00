@@ -1,0 +1,570 @@
+\documentclass[10pt]{beamer}
+
+\usepackage{iftex}
+\usepackage{booktabs}
+\usepackage{tikz}
+
+\usetikzlibrary{positioning, calc}
+
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{eurosym}
+  \newcommand{\EUR}{\euro}
+\else
+  \newcommand{\EUR}{€}
+\fi
+
+\usetheme[progressbar=frametitle]{metropolis}
+
+% Brand palette from the CV
+\definecolor{primary}{HTML}{010259}    % Primario
+\definecolor{secondary}{HTML}{232F3E}    % Secundario
+\definecolor{terciary}{HTML}{007EB9}   % Terciario
+\definecolor{black}{HTML}{000000}      % Texto normal
+
+\setbeamercolor{normal text}{fg=black, bg=white}
+\setbeamercolor{alerted text}{fg=terciary}
+\setbeamercolor{example text}{fg=terciary}
+\setbeamercolor{palette primary}{fg=white, bg=primary}
+\setbeamercolor{frametitle}{fg=white, bg=primary}
+\setbeamercolor{progress bar}{fg=terciary, bg=terciary!40!primary!20}
+\setbeamercolor{title separator}{fg=terciary}
+\setbeamercolor{itemize item}{fg=terciary}
+\setbeamercolor{itemize subitem}{fg=primary}
+\setbeamercolor{enumerate item}{fg=terciary}
+\setbeamercolor{description item}{fg=primary}
+\setbeamercolor{section in toc}{fg=primary}
+\setbeamercolor{subsection in toc}{fg=secondary}
+\setbeamercolor{caption name}{fg=primary}
+\usebeamercolor[fg]{normal text}
+
+\metroset{block=fill}
+\setbeamercolor{block title}{fg=white, bg=primary}
+\setbeamercolor{block body}{bg=primary!8, fg=black}
+\setbeamercolor{block title alerted}{fg=white, bg=terciary}
+\setbeamercolor{block body alerted}{bg=terciary!12, fg=black}
+\setbeamercolor{block title example}{fg=white, bg=secondary}
+\setbeamercolor{block body example}{bg=secondary!10, fg=black}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=primary,
+  urlcolor=terciary,
+  citecolor=terciary
+}
+
+% Skill rating: 3 = advanced, 2 = proficient, 1 = working.
+\newcommand{\doton}{\tikz[baseline=-0.7pt]\fill[terciary] (0,0) circle (2.15pt);}
+\newcommand{\dotoff}{\tikz[baseline=-0.7pt]\fill[black!18] (0,0) circle (2.15pt);}
+\newcommand{\level}[1]{%
+  \ifcase#1\relax
+  \or \doton\,\dotoff\,\dotoff
+  \or \doton\,\doton\,\dotoff
+  \or \doton\,\doton\,\doton
+  \fi
+}
+\newcommand{\skillrow}[2]{%
+  \makebox[0.78\linewidth][l]{#1}~\level{#2}%
+}
+
+\title{Andr\'es Herencia}
+\subtitle{Forward Deployed AI Engineer}
+\author[Andr\'es Herencia]{GenAI \textbullet{} MLOps \textbullet{} Cloud architecture}
+\institute{InnoIT @ Moody's, Madrid}
+\date{}
+
+\setbeamertemplate{frame footer}{%
+  Andr\'es Herencia
+  \textbullet{}
+  \href{https://github.com/andreshere00}{github.com/andreshere00}
+}
+
+\begin{document}
+
+{
+  \setbeamercolor{background canvas}{bg=primary}
+  \setbeamercolor{normal text}{fg=white, bg=primary}
+  \setbeamercolor{titlelike}{fg=white}
+  \setbeamercolor{author}{fg=white}
+  \setbeamercolor{institute}{fg=white}
+  \setbeamercolor{date}{fg=white}
+  \setbeamercolor{title separator}{fg=terciary}
+  \usebeamercolor[fg]{normal text}
+  \maketitle
+}
+
+\begin{frame}{Table of contents}
+  \setbeamertemplate{section in toc}[sections numbered]
+  \tableofcontents[hideallsubsections]
+\end{frame}
+
+%------------------------------------------------------------------------------
+\section{About me}
+
+\begin{frame}{Profile}
+  Telecommunication Engineer from the
+  \href{https://www.upm.es/}{Polytechnic University of Madrid}
+  (top Spanish university in Telecommunication Engineering) and
+  Master's Degree in Data Science, with \alert{over four years} of experience
+  designing and deploying Generative AI solutions, MLOps pipelines, and
+  high-performance, scalable cloud architectures.
+
+  \vspace{0.6em}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.48\textwidth}
+      \begin{block}{Identity}
+        Forward Deployed AI Engineer\\
+        InnoIT @ Moody's \textbullet{} Madrid
+      \end{block}
+    \column{0.48\textwidth}
+      \begin{exampleblock}{Credentials}
+        2$\times$ AWS-Certified:\\
+        Solutions Architect (SAA) \&\\
+        Machine Learning Engineer (MLA)
+      \end{exampleblock}
+  \end{columns}
+
+  \vspace{0.35em}
+  {\footnotesize
+    \href{https://maps.app.goo.gl/QnwKxmFKUzQpsAaU6}{Madrid, Spain}
+    \textbullet{}
+    \href{mailto:andresherencia2000@gmail.com}{andresherencia2000@gmail.com}
+    \textbullet{}
+    \href{tel:+34608325729}{+34 608 325 729}\\
+    \href{https://www.linkedin.com/in/andres-herencia/}{LinkedIn}
+    \textbullet{}
+    \href{https://github.com/andreshere00}{GitHub}
+  }
+\end{frame}
+
+%------------------------------------------------------------------------------
+\section{Professional experience}
+
+\begin{frame}{Career path}
+  \begin{table}
+    \small
+    \begin{tabular}{@{}lll@{}}
+      \toprule
+      Period & Role & Organisation \\
+      \midrule
+      Jan 2026 -- now & AI Engineer & Moody's (InnoIT) \\
+      Sep 2024 -- Jan 2026 & ML Engineer & BBVA (Minsait) \\
+      Feb 2024 -- Sep 2024 & DevOps / MLOps & The Cliff \\
+      Oct 2022 -- Apr 2023 & Big Data researcher & UPM / SUNRISE \\
+      Dec 2021 -- Jun 2022 & Data Scientist & Cabify Chair \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+\end{frame}
+
+\subsection{Moody's}
+
+\begin{frame}{Moody's (InnoIT) \textperiodcentered{} AI Engineer}
+  \textbf{Since January 2026} \hfill Madrid, Spain
+
+  \vspace{0.3em}
+  Building MCP tools and agents for interactive financial workflows
+  (PESTLE reports, executive summaries, and related products) on the
+  Moody's GenAI Assistant.
+
+  \begin{itemize}
+    \item New assistant features, event-driven productisation, and QA
+    \item Reviews and engineering standards for collaborators
+    \item Internal use cases for consulting engagements and technical
+          interviews
+  \end{itemize}
+
+  \begin{exampleblock}{Moody's}
+    Data, intelligence and analytical tools so business and financial leaders
+    can make confident decisions --- more than 115 years of expertise.
+    \hfill \href{https://www.moodys.com/}{moodys.com}
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Moody's \textperiodcentered{} selected deliveries}
+  \begin{itemize}
+    \item Ready-to-use \alert{agentic workflows}, including an HMAS
+          (Hierarchical Multi-Agent System) that builds automatic financial
+          memories for Moody's partner companies.
+    \item Agentic product that generates \alert{EWS reports} automatically.
+    \item Stack: TypeScript, React, Node.js, AWS, GitHub,
+          OpenAI, Gemini, Claude.
+  \end{itemize}
+
+  \vspace{0.4em}
+  \begin{alertblock}{Flagship result}
+    Agentic EWS reports: \textbf{5--20 days $\rightarrow$ 3--15 min}
+    ($\sim$99\%+ faster).
+  \end{alertblock}
+\end{frame}
+
+\subsection{BBVA}
+
+\begin{frame}{BBVA (Minsait) \textperiodcentered{} Machine Learning Engineer}
+  \textbf{September 2024 -- January 2026} \hfill 1 year 5 months \textbullet{}
+  Madrid, Spain
+
+  \vspace{0.2em}
+  Industrialising Generative AI systems and web applications for BBVA, in
+  hybrid environments: cloud-native (AWS \& Azure) and on-premises.
+
+  \begin{itemize}
+    \item Productivise GenAI projects that support banking processes.
+    \item Design fully \alert{serverless} architectures on AWS.
+    \item Enforce best practices for Generative AI applications.
+  \end{itemize}
+
+  \begin{exampleblock}{BBVA}
+    Global financial group founded in 1857. Present in 25+ countries; strong
+    leadership in Spain, Mexico, South America and Turkey.
+    \hfill \href{https://www.bbva.com/en/}{bbva.com}
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{BBVA \textperiodcentered{} platforms and impact}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.50\textwidth}
+      \begin{block}{BigRAG}
+        Hybrid RAG architecture for large-scale data ingestion on AWS.
+      \end{block}
+      \begin{exampleblock}{LLM Evaluator}
+        Automatic evaluation of LLMs and RAG systems on Azure.
+      \end{exampleblock}
+    \column{0.48\textwidth}
+      \begin{alertblock}{BBVA Claims}
+        Email + attachment classification:
+        \begin{itemize}
+          \item 30--60 min $\rightarrow$ \textbf{< 3 min}
+          \item Quality metrics up to \textbf{90--95\%}
+          \item Cost \textbf{< 50 cents} per mail
+        \end{itemize}
+      \end{alertblock}
+  \end{columns}
+
+  \vspace{0.2em}
+  {\small Python \textbullet{} AWS \textbullet{} Azure \textbullet{} BitBucket
+  \textbullet{} LangChain \textbullet{} OpenAI}
+\end{frame}
+
+\subsection{The Cliff}
+
+\begin{frame}{The Cliff \textperiodcentered{} DevOps / MLOps Engineer}
+  \textbf{February 2024 -- September 2024} \hfill 8 months \textbullet{}
+  Madrid, Spain
+
+  Cloud \& AI on \textbf{Maind} (enterprise LLM platform) and
+  \textbf{Logos360} (HR evaluation).
+
+  \vspace{0.15em}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.33\textwidth}
+      \begin{block}{MLOps}
+        Observability with Langfuse.
+      \end{block}
+    \column{0.33\textwidth}
+      \begin{exampleblock}{Data science}
+        RAG on Qdrant.
+      \end{exampleblock}
+    \column{0.33\textwidth}
+      \begin{alertblock}{DevOps}
+        ECS, EKS, EC2, GitLab CI/CD.
+      \end{alertblock}
+  \end{columns}
+
+  \begin{exampleblock}{The Cliff}
+    Spanish start-up and consultancy that ships pioneer AI-based products.
+    \hfill \href{https://the-cliff.com/}{the-cliff.com}
+  \end{exampleblock}
+\end{frame}
+
+\subsection{Research}
+
+\begin{frame}{UPM \textperiodcentered{} Big Data \& Simulation Researcher}
+  \textbf{October 2022 -- April 2023} \hfill 7 months \textbullet{} Madrid, Spain
+
+  R\&D engineer on the European \href{https://sunrise-europe.eu/}{SUNRISE}
+  project: resilience of critical infrastructures through data analysis and
+  optimisation.
+
+  \begin{itemize}
+    \item Geospatial processing with the Google Earth API.
+    \item Mathematical optimisation of transport availability for the
+          \href{https://www.crtm.es/}{CRTM} metro network.
+    \item Analytical assessment of water distribution networks (WDN) to
+          support crisis resilience for ACOSOL (Costa del Sol).
+  \end{itemize}
+
+  \begin{exampleblock}{SUNRISE}
+    EU project on crisis resilience for critical infrastructures, including
+    potable water (ACOSOL) and public transport (CRTM).
+    \hfill \href{https://sunrise-europe.eu/}{sunrise-europe.eu}
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{Cabify \textperiodcentered{} Data Scientist}
+  \textbf{December 2021 -- June 2022} \hfill 7 months \textbullet{} Madrid, Spain
+
+  Machine learning modules for a multi-agent simulation used to test
+  marketplace pricing safely, outside production.
+
+  \begin{itemize}
+    \item Agent generation with time-series models (\alert{SARIMA}) and
+          Gaussian Mixture Models (\alert{GMM}).
+    \item Transactional behaviour with multimodal logistic regression.
+    \item Simulator still used internally to refine marketplace strategy.
+  \end{itemize}
+
+  \begin{exampleblock}{Cabify}
+    Ibero-American mobility platform (ride-hailing, corporate transport,
+    logistics) in 40+ cities across 6 countries.
+    \hfill \href{https://cabify.com/en}{cabify.com}
+  \end{exampleblock}
+\end{frame}
+
+%------------------------------------------------------------------------------
+\section{Featured work}
+
+\begin{frame}{Open source and product work}
+  \begin{itemize}
+    \item \href{https://github.com/andreshere00/Splitter_MR}{\textbf{SplitterMR}}
+          --- Python library for LLM-ready document chunking
+          (\href{https://pypi.org/project/splitter-mr/}{PyPI}, 20+ GitHub stars,
+          used internally at Minsait).
+    \item \href{https://github.com/andreshere00/PPTX-Generator}{\textbf{PresentIA}}
+          --- MVP that turns prompts and media into editable PowerPoint decks
+          (HORSE Powertrain / Renault Group, tenant InnoIT).
+    \item \href{https://github.com/andreshere00/aws_cli_mcp}{\textbf{AWS CLI MCP}}
+          --- agent that runs AWS CLI instructions over the Model Context
+          Protocol.
+    \item \href{https://github.com/andreshere00/TFM-LLM}{\textbf{Master's thesis}}
+          --- mathematical analysis of the Transformer and an LLM for mental
+          health counselling.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{SplitterMR}
+  Library with four building blocks: \textbf{Readers}, \textbf{Models \&
+  embedders}, and \textbf{Splitters}.
+
+  \begin{itemize}
+    \item Readers extract file content to Markdown (Docling, MarkItDown, or a
+          custom base class).
+    \item Splitters chunk by characters, grammar, tokens, code separators,
+          semantic similarity, or schema.
+    \item Visual Language Models read scans, images and tables
+          (OpenAI, Anthropic, Hugging Face, Gemini, Grok, or BYO model).
+  \end{itemize}
+
+  \begin{exampleblock}{Status}
+    Published on PyPI \textbullet{} 20+ GitHub stars \textbullet{} used on
+    internal Minsait projects\\
+    \href{https://github.com/andreshere00/Splitter_MR}{github.com/andreshere00/Splitter\_MR}
+  \end{exampleblock}
+\end{frame}
+
+\begin{frame}{PresentIA (Shadowfax)}
+  End-to-end MVP for HORSE Powertrain (Renault Group), tenant InnoIT:
+  prompts and user media become editable \texttt{.pptx} decks.
+
+  \begin{columns}[T,onlytextwidth]
+    \column{0.52\textwidth}
+      \begin{itemize}
+        \item FastAPI: auth, projects, uploads, generation, storage
+        \item Next.js App Router UI with shadcn/ui
+        \item Vertex AI + python-pptx on GCS templates
+        \item Terraform IaC: Cloud Run, Firestore, GCS (with ADRs)
+        \item Path to InnoIT (Render + Supabase) via deployment profiles
+      \end{itemize}
+    \column{0.46\textwidth}
+      \begin{alertblock}{Working MVP}
+        Create project, upload assets, generate and download editable decks.
+        Cost in EUR stored in Firestore. 3/3 E2E gate on Cloud Run.
+        Workflow: \texttt{mise}, Ruff, ESLint, pytest.
+      \end{alertblock}
+  \end{columns}
+
+  {\footnotesize Python, FastAPI, Pydantic, GCP, TypeScript, React, Docker,
+  Terraform, Supabase}
+\end{frame}
+
+\begin{frame}{Other builds}
+  \begin{block}{GenAI application template}
+    Cookiecutter for Python LLM backends: providers, services and
+    infrastructure chosen up front.
+    \href{https://github.com/andreshere00/GenAI-app-template}{github.com/andreshere00/GenAI-app-template}
+  \end{block}
+
+  \begin{exampleblock}{Fantasy MCP CLI}
+    TypeScript (ESM) LaLiga Fantasy engine with Clean Architecture.
+    MCP tools (search + scrape) help an LLM pick the weekly lineup.
+    \href{https://github.com/andreshere00/fantasy_mcp}{github.com/andreshere00/fantasy\_mcp}
+  \end{exampleblock}
+
+  \begin{alertblock}{AWS MCP application}
+    DDD / hexagonal MCP server that executes AWS CLI via an LLM agent
+    (work in progress, multi-model).
+    \href{https://github.com/andreshere00/aws_cli_mcp}{github.com/andreshere00/aws\_cli\_mcp}
+  \end{alertblock}
+\end{frame}
+
+%------------------------------------------------------------------------------
+\section{Education}
+
+\begin{frame}{Degrees}
+  \begin{block}{2024 \textperiodcentered{} Master's Degree}
+    Statistical and Computational Data Science\\
+    \textit{Universidad Complutense de Madrid}
+    (with Universidad Polit\'ecnica de Madrid)
+  \end{block}
+
+  \begin{exampleblock}{2022 \textperiodcentered{} Bachelor's Degree}
+    Telecommunication Engineering\\
+    \textit{Universidad Polit\'ecnica de Madrid}
+  \end{exampleblock}
+
+  \begin{alertblock}{Master's thesis}
+    Mathematical analysis of the Transformer architecture and application on
+    a large language model for mental health counselling.\\
+    \href{https://docta.ucm.es/entities/publication/093fac7e-17fa-4d56-94ab-c984067ad3ac}{Read the thesis}
+  \end{alertblock}
+\end{frame}
+
+%------------------------------------------------------------------------------
+\section{Certifications \& skills}
+
+\begin{frame}{AWS certifications}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.48\textwidth}
+      \begin{block}{Solutions Architect -- Associate}
+        April 2025\\
+        Secure, well-architected distributed systems: scalable, resilient,
+        efficient, fault-tolerant.\\[0.4em]
+        {\small\href{https://www.credly.com/badges/f1549694-8ebf-489b-882d-4cad12fa593a/public_url}{View badge}}
+      \end{block}
+    \column{0.48\textwidth}
+      \begin{exampleblock}{ML Engineer -- Associate}
+        November 2024\\
+        Ingest, transform, train, deploy and monitor ML workloads in
+        production.\\[0.4em]
+        {\small\href{https://www.credly.com/badges/94609834-c001-4dec-b8aa-c07957444f1e/public_url}{View badge}}
+      \end{exampleblock}
+  \end{columns}
+\end{frame}
+
+\begin{frame}{Courses}
+  \begin{table}
+    \small
+    \begin{tabular}{@{}p{0.72\textwidth}l@{}}
+      \toprule
+      Course & Date \\
+      \midrule
+      Mastering Software Architecture Patterns and System Design & May 2026 \\
+      AI Engineer Agentic Track: Agents and MCP & November 2025 \\
+      MLflow in Action & October 2025 \\
+      FastAPI --- The Complete Course & July 2025 \\
+      A deep understanding of deep learning & April 2024 \\
+      \bottomrule
+    \end{tabular}
+  \end{table}
+\end{frame}
+
+\begin{frame}{Skills by expertise}
+  \begin{center}
+    \small
+    Advanced~\level{3}
+    \qquad Proficient~\level{2}
+    \qquad Working~\level{1}
+  \end{center}
+
+  \vspace{0.5em}
+  \begin{columns}[T,onlytextwidth]
+    \column{0.32\textwidth}
+      \textbf{Data science}\\[0.3em]
+      {\small
+      \skillrow{GenAI \& LLMs}{3}\\
+      \skillrow{Tools \& agents}{3}\\
+      \skillrow{MCP}{3}\\
+      \skillrow{Machine Learning}{3}\\
+      \skillrow{Statistical methods}{3}\\
+      \skillrow{Deep Learning}{2}}
+    \column{0.32\textwidth}
+      \textbf{Software}\\[0.3em]
+      {\small
+      \skillrow{Python}{3}\\
+      \skillrow{Git}{3}\\
+      \skillrow{JavaScript \& TS}{3}\\
+      \skillrow{Design patterns}{2}\\
+      \skillrow{Good practices}{2}\\
+      \skillrow{Java}{1}}
+    \column{0.32\textwidth}
+      \textbf{Cloud}\\[0.3em]
+      {\small
+      \skillrow{Solutions arch.}{3}\\
+      \skillrow{ML services}{3}\\
+      \skillrow{Compute \& storage}{2}\\
+      \skillrow{CI/CD}{2}\\
+      \skillrow{IaC}{2}}
+  \end{columns}
+
+  \vspace{0.7em}
+  \textbf{Languages:} Spanish C2 (native) \textbullet{} English C1
+  (full work proficiency) \textbullet{} Italian (learning)
+\end{frame}
+
+\begin{frame}{Conferences and events}
+  \begin{block}{AWS Summit Madrid 2026 \textperiodcentered{} participant}
+    One-day event on AI and cloud: agentic AI, serverless, and how those
+    technologies are reshaping industry.
+  \end{block}
+
+  \begin{exampleblock}{Applied AI beyond the hype (2026) \textperiodcentered{} participant}
+    \begin{itemize}
+      \item \emph{AI Grading} --- Est\'ibaliz Torralbo: AI-assisted quality
+            assessments that reduce uncertainty when evaluating devices.
+      \item \emph{Behind the GenAI Buzzwords} --- Alessandro Canino:
+            embeddings, retrieval, agents, evaluation, observability,
+            hallucination control, and security.
+    \end{itemize}
+  \end{exampleblock}
+\end{frame}
+
+%------------------------------------------------------------------------------
+\section{Conclusion}
+
+\begin{frame}{Summary}
+  I design and ship \alert{Generative AI products} --- agents, RAG systems,
+  and MLOps --- on AWS, Azure and GCP.
+
+  \vspace{0.5em}
+  \begin{itemize}
+    \item Forward Deployed AI Engineer at \textbf{InnoIT @ Moody's}
+    \item Proven delivery in banking (BBVA), industry (HORSE / Renault),
+          mobility (Cabify) and European R\&D (SUNRISE)
+    \item 2$\times$ AWS-Certified (SAA + MLA)
+    \item Open-source maintainer of
+          \href{https://github.com/andreshere00/Splitter_MR}{SplitterMR}
+  \end{itemize}
+
+  \vspace{0.4em}
+  \begin{center}
+    \href{https://github.com/andreshere00}{github.com/andreshere00}
+    \quad\textbullet\quad
+    \href{https://www.linkedin.com/in/andres-herencia/}{LinkedIn}
+    \quad\textbullet\quad
+    \href{mailto:andresherencia2000@gmail.com}{Email}
+  \end{center}
+\end{frame}
+
+{
+\setbeamercolor{palette primary}{fg=white, bg=primary}
+\setbeamertemplate{frame footer}{}
+\setbeamertemplate{frame numbering}[none]
+\begin{frame}[standout]
+  Let's talk.\\[0.6em]
+  {\normalsize
+    \href{mailto:andresherencia2000@gmail.com}{andresherencia2000@gmail.com}}
+\end{frame}
+}
+
+\end{document}
