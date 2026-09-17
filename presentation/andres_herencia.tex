@@ -1,7 +1,6 @@
 \documentclass[10pt]{beamer}
 
 \usepackage{iftex}
-\usepackage{pgfplots}
 \usepackage{booktabs}
 \usepackage{tikz}
 
@@ -17,7 +16,6 @@
 \fi
 
 \usetheme[progressbar=frametitle]{metropolis}
-\usepackage{appendixnumberbeamer}
 
 % Brand palette from the CV
 \definecolor{primary}{HTML}{010259}    % Primario
@@ -49,17 +47,6 @@
 \setbeamercolor{block title example}{fg=white, bg=secondary}
 \setbeamercolor{block body example}{bg=secondary!10, fg=black}
 
-\pgfplotscreateplotcyclelist{mbarplot cycle}{%
-  {draw=primary, fill=primary!80},
-  {draw=terciary, fill=terciary!80},
-  {draw=secondary, fill=secondary!80},
-}
-\pgfplotscreateplotcyclelist{mlineplot cycle}{%
-  {primary, mark=*, mark size=1.5pt},
-  {terciary, mark=square*, mark size=1.3pt},
-  {secondary, mark=triangle*, mark size=1.5pt},
-}
-
 \hypersetup{
   colorlinks=true,
   linkcolor=primary,
@@ -67,19 +54,18 @@
   citecolor=terciary
 }
 
-\newcommand{\statcard}[3]{%
-  \begin{tikzpicture}
-    \node[
-      fill=#1,
-      text=white,
-      rounded corners=2pt,
-      inner sep=7pt,
-      minimum width=0.28\textwidth,
-      minimum height=2.15cm,
-      align=center,
-      font=\small
-    ] {{\LARGE\bfseries #2}\\[3pt]#3};
-  \end{tikzpicture}%
+% Skill rating: 3 = advanced, 2 = proficient, 1 = working.
+\newcommand{\doton}{\tikz[baseline=-0.7pt]\fill[terciary] (0,0) circle (2.15pt);}
+\newcommand{\dotoff}{\tikz[baseline=-0.7pt]\fill[black!18] (0,0) circle (2.15pt);}
+\newcommand{\level}[1]{%
+  \ifcase#1\relax
+  \or \doton\,\dotoff\,\dotoff
+  \or \doton\,\doton\,\dotoff
+  \or \doton\,\doton\,\doton
+  \fi
+}
+\newcommand{\skillrow}[2]{%
+  \makebox[0.78\linewidth][l]{#1}~\level{#2}%
 }
 
 \title{Andr\'es Herencia}
@@ -141,7 +127,7 @@
 
   \vspace{0.35em}
   {\footnotesize
-    \href{https://maps.app.goo.gl/QnwKxmFKUzQpsAaU6}{Madrid}
+    \href{https://maps.app.goo.gl/QnwKxmFKUzQpsAaU6}{Madrid, Spain}
     \textbullet{}
     \href{mailto:andresherencia2000@gmail.com}{andresherencia2000@gmail.com}
     \textbullet{}
@@ -150,19 +136,6 @@
     \textbullet{}
     \href{https://github.com/andreshere00}{GitHub}
   }
-\end{frame}
-
-\begin{frame}{At a glance}
-  \begin{columns}[T,onlytextwidth]
-    \column{0.48\textwidth}
-      \centering
-      \statcard{primary}{4+}{years in AI / ML / cloud}\\[0.7em]
-      \statcard{secondary}{99\%+}{faster EWS report generation}
-    \column{0.48\textwidth}
-      \centering
-      \statcard{terciary}{2$\times$}{AWS professional certifications}\\[0.7em]
-      \statcard{primary}{<\,3 min}{BBVA claims classification}
-  \end{columns}
 \end{frame}
 
 %------------------------------------------------------------------------------
@@ -190,28 +163,23 @@
 \begin{frame}{Moody's (InnoIT) \textperiodcentered{} AI Engineer}
   \textbf{Since January 2026} \hfill Madrid, Spain
 
-  \vspace{0.4em}
+  \vspace{0.3em}
   Building MCP tools and agents for interactive financial workflows
   (PESTLE reports, executive summaries, and related products) on the
   Moody's GenAI Assistant.
 
-  \vspace{0.3em}
-  \begin{columns}[T,onlytextwidth]
-    \column{0.52\textwidth}
-      \textbf{Focus}
-      \begin{itemize}
-        \item New assistant features
-        \item Event-driven productisation
-        \item QA on existing capabilities
-        \item Reviews and engineering standards
-      \end{itemize}
-    \column{0.46\textwidth}
-      \begin{alertblock}{Flagship result}
-        Agentic EWS reports:\\
-        \textbf{5--20 days $\rightarrow$ 3--15 min}\\
-        ($\sim$99\%+ faster)
-      \end{alertblock}
-  \end{columns}
+  \begin{itemize}
+    \item New assistant features, event-driven productisation, and QA
+    \item Reviews and engineering standards for collaborators
+    \item Internal use cases for consulting engagements and technical
+          interviews
+  \end{itemize}
+
+  \begin{exampleblock}{Moody's}
+    Data, intelligence and analytical tools so business and financial leaders
+    can make confident decisions --- more than 115 years of expertise.
+    \hfill \href{https://www.moodys.com/}{moodys.com}
+  \end{exampleblock}
 \end{frame}
 
 \begin{frame}{Moody's \textperiodcentered{} selected deliveries}
@@ -225,28 +193,33 @@
   \end{itemize}
 
   \vspace{0.4em}
-  \begin{exampleblock}{Context}
-    Moody's provides data, intelligence and analytical tools so business and
-    financial leaders can make confident decisions --- more than 115 years of
-    expertise. \hfill \href{https://www.moodys.com/}{moodys.com}
-  \end{exampleblock}
+  \begin{alertblock}{Flagship result}
+    Agentic EWS reports: \textbf{5--20 days $\rightarrow$ 3--15 min}
+    ($\sim$99\%+ faster).
+  \end{alertblock}
 \end{frame}
 
 \subsection{BBVA}
 
 \begin{frame}{BBVA (Minsait) \textperiodcentered{} Machine Learning Engineer}
-  \textbf{September 2024 -- January 2026} \hfill 1 year 5 months \textbullet{} Madrid
+  \textbf{September 2024 -- January 2026} \hfill 1 year 5 months \textbullet{}
+  Madrid, Spain
 
-  \vspace{0.3em}
+  \vspace{0.2em}
   Industrialising Generative AI systems and web applications for BBVA, in
   hybrid environments: cloud-native (AWS \& Azure) and on-premises.
 
   \begin{itemize}
     \item Productivise GenAI projects that support banking processes.
-    \item Plan and distribute technical work with Agile methods.
     \item Design fully \alert{serverless} architectures on AWS.
     \item Enforce best practices for Generative AI applications.
   \end{itemize}
+
+  \begin{exampleblock}{BBVA}
+    Global financial group founded in 1857. Present in 25+ countries; strong
+    leadership in Spain, Mexico, South America and Turkey.
+    \hfill \href{https://www.bbva.com/en/}{bbva.com}
+  \end{exampleblock}
 \end{frame}
 
 \begin{frame}{BBVA \textperiodcentered{} platforms and impact}
@@ -277,40 +250,38 @@
 \subsection{The Cliff}
 
 \begin{frame}{The Cliff \textperiodcentered{} DevOps / MLOps Engineer}
-  \textbf{February 2024 -- September 2024} \hfill 8 months \textbullet{} Madrid
+  \textbf{February 2024 -- September 2024} \hfill 8 months \textbullet{}
+  Madrid, Spain
 
-  Cloud \& AI engineer on two production products:
-  \begin{itemize}
-    \item \textbf{Maind} --- LLM-powered enterprise platform for everyday
-          AI services.
-    \item \textbf{Logos360} --- HR solution for personnel evaluation.
-  \end{itemize}
+  Cloud \& AI on \textbf{Maind} (enterprise LLM platform) and
+  \textbf{Logos360} (HR evaluation).
 
+  \vspace{0.15em}
   \begin{columns}[T,onlytextwidth]
     \column{0.33\textwidth}
       \begin{block}{MLOps}
-        LLM observability, traceability and monitoring with Langfuse.
+        Observability with Langfuse.
       \end{block}
     \column{0.33\textwidth}
       \begin{exampleblock}{Data science}
-        RAG in Python on a Qdrant vector database.
+        RAG on Qdrant.
       \end{exampleblock}
     \column{0.33\textwidth}
       \begin{alertblock}{DevOps}
-        ECS, EKS, EC2, GitLab CI/CD, AWS automation and security.
+        ECS, EKS, EC2, GitLab CI/CD.
       \end{alertblock}
   \end{columns}
 
-  \vspace{0.3em}
-  {\small Python \textbullet{} AWS \textbullet{} TypeScript \textbullet{} FastAPI
-  \textbullet{} Langfuse \textbullet{} LangChain \textbullet{} OpenAI, Claude,
-  LLaMA, Grok \hfill \href{https://the-cliff.com/}{the-cliff.com}}
+  \begin{exampleblock}{The Cliff}
+    Spanish start-up and consultancy that ships pioneer AI-based products.
+    \hfill \href{https://the-cliff.com/}{the-cliff.com}
+  \end{exampleblock}
 \end{frame}
 
 \subsection{Research}
 
 \begin{frame}{UPM \textperiodcentered{} Big Data \& Simulation Researcher}
-  \textbf{October 2022 -- April 2023} \hfill 7 months \textbullet{} Madrid
+  \textbf{October 2022 -- April 2023} \hfill 7 months \textbullet{} Madrid, Spain
 
   R\&D engineer on the European \href{https://sunrise-europe.eu/}{SUNRISE}
   project: resilience of critical infrastructures through data analysis and
@@ -324,12 +295,15 @@
           support crisis resilience for ACOSOL (Costa del Sol).
   \end{itemize}
 
-  {\small Java \textbullet{} Scala \textbullet{} Python \textbullet{} PySpark
-  \textbullet{} Google Earth API}
+  \begin{exampleblock}{SUNRISE}
+    EU project on crisis resilience for critical infrastructures, including
+    potable water (ACOSOL) and public transport (CRTM).
+    \hfill \href{https://sunrise-europe.eu/}{sunrise-europe.eu}
+  \end{exampleblock}
 \end{frame}
 
 \begin{frame}{Cabify \textperiodcentered{} Data Scientist}
-  \textbf{December 2021 -- June 2022} \hfill 7 months \textbullet{} Madrid
+  \textbf{December 2021 -- June 2022} \hfill 7 months \textbullet{} Madrid, Spain
 
   Machine learning modules for a multi-agent simulation used to test
   marketplace pricing safely, outside production.
@@ -341,45 +315,11 @@
     \item Simulator still used internally to refine marketplace strategy.
   \end{itemize}
 
-  \begin{exampleblock}{Company}
+  \begin{exampleblock}{Cabify}
     Ibero-American mobility platform (ride-hailing, corporate transport,
     logistics) in 40+ cities across 6 countries.
     \hfill \href{https://cabify.com/en}{cabify.com}
   \end{exampleblock}
-\end{frame}
-
-%------------------------------------------------------------------------------
-\section{Selected impact}
-
-\begin{frame}{Selected impact}
-  \begin{columns}[T,onlytextwidth]
-    \column{0.48\textwidth}
-      \begin{alertblock}{Moody's EWS}
-        Report generation from \textbf{5--20 days} to
-        \textbf{3--15 minutes} ($\sim$99\%+ faster).
-      \end{alertblock}
-      \begin{block}{BBVA Claims}
-        \textbf{30--60 min} $\rightarrow$ \textbf{< 3 min},
-        quality \textbf{90--95\%}, cost \textbf{< 0.50\,\EUR}/mail.
-      \end{block}
-    \column{0.50\textwidth}
-      \begin{tikzpicture}
-        \begin{axis}[
-          mbarplot,
-          symbolic x coords={Before, After},
-          xtick=data,
-          ylabel={Claims time (min)},
-          ymin=0, ymax=55,
-          width=0.95\textwidth,
-          height=4.6cm,
-          nodes near coords,
-          every node near coord/.append style={font=\scriptsize},
-          enlarge x limits=0.45,
-        ]
-          \addplot[draw=primary, fill=primary] coordinates {(Before,45) (After,3)};
-        \end{axis}
-      \end{tikzpicture}
-  \end{columns}
 \end{frame}
 
 %------------------------------------------------------------------------------
@@ -424,9 +364,8 @@
 \end{frame}
 
 \begin{frame}{PresentIA (Shadowfax)}
-  End-to-end MVP for HORSE Powertrain (Renault Group), built for tenant
-  InnoIT: natural-language prompts and user media become editable
-  \texttt{.pptx} decks.
+  End-to-end MVP for HORSE Powertrain (Renault Group), tenant InnoIT:
+  prompts and user media become editable \texttt{.pptx} decks.
 
   \begin{columns}[T,onlytextwidth]
     \column{0.52\textwidth}
@@ -434,14 +373,19 @@
         \item FastAPI: auth, projects, uploads, generation, storage
         \item Next.js App Router UI with shadcn/ui
         \item Vertex AI + python-pptx on GCS templates
-        \item Terraform IaC: Cloud Run, Firestore, GCS
+        \item Terraform IaC: Cloud Run, Firestore, GCS (with ADRs)
+        \item Path to InnoIT (Render + Supabase) via deployment profiles
       \end{itemize}
     \column{0.46\textwidth}
       \begin{alertblock}{Working MVP}
         Create project, upload assets, generate and download editable decks.
         Cost in EUR stored in Firestore. 3/3 E2E gate on Cloud Run.
+        Workflow: \texttt{mise}, Ruff, ESLint, pytest.
       \end{alertblock}
   \end{columns}
+
+  {\footnotesize Python, FastAPI, Pydantic, GCP, TypeScript, React, Docker,
+  Terraform, Supabase}
 \end{frame}
 
 \begin{frame}{Other builds}
@@ -508,12 +452,12 @@
   \end{columns}
 \end{frame}
 
-\begin{frame}{Further certifications}
+\begin{frame}{Courses}
   \begin{table}
     \small
     \begin{tabular}{@{}p{0.72\textwidth}l@{}}
       \toprule
-      Certification & Date \\
+      Course & Date \\
       \midrule
       Mastering Software Architecture Patterns and System Design & May 2026 \\
       AI Engineer Agentic Track: Agents and MCP & November 2025 \\
@@ -525,40 +469,45 @@
   \end{table}
 \end{frame}
 
-\begin{frame}{Skills}
+\begin{frame}{Skills by expertise}
+  \begin{center}
+    \small
+    Advanced~\level{3}
+    \qquad Proficient~\level{2}
+    \qquad Working~\level{1}
+  \end{center}
+
+  \vspace{0.5em}
   \begin{columns}[T,onlytextwidth]
-    \column{0.33\textwidth}
-      \textbf{Data science}
-      \begin{itemize}
-        \item Machine Learning
-        \item GenAI \& LLMs
-        \item Tools \& agents
-        \item Deep Learning
-        \item Statistical methods
-        \item MCP
-      \end{itemize}
-    \column{0.33\textwidth}
-      \textbf{Software}
-      \begin{itemize}
-        \item Python
-        \item JavaScript \& TypeScript
-        \item Java
-        \item Git
-        \item Design patterns
-        \item Good practices
-      \end{itemize}
-    \column{0.33\textwidth}
-      \textbf{Cloud}
-      \begin{itemize}
-        \item Solutions architecture
-        \item Compute \& storage
-        \item ML services
-        \item IaC
-        \item CI/CD
-      \end{itemize}
+    \column{0.32\textwidth}
+      \textbf{Data science}\\[0.3em]
+      {\small
+      \skillrow{GenAI \& LLMs}{3}\\
+      \skillrow{Tools \& agents}{3}\\
+      \skillrow{MCP}{3}\\
+      \skillrow{Machine Learning}{3}\\
+      \skillrow{Statistical methods}{3}\\
+      \skillrow{Deep Learning}{2}}
+    \column{0.32\textwidth}
+      \textbf{Software}\\[0.3em]
+      {\small
+      \skillrow{Python}{3}\\
+      \skillrow{Git}{3}\\
+      \skillrow{JavaScript \& TS}{3}\\
+      \skillrow{Design patterns}{2}\\
+      \skillrow{Good practices}{2}\\
+      \skillrow{Java}{1}}
+    \column{0.32\textwidth}
+      \textbf{Cloud}\\[0.3em]
+      {\small
+      \skillrow{Solutions arch.}{3}\\
+      \skillrow{ML services}{3}\\
+      \skillrow{Compute \& storage}{2}\\
+      \skillrow{CI/CD}{2}\\
+      \skillrow{IaC}{2}}
   \end{columns}
 
-  \vspace{0.6em}
+  \vspace{0.7em}
   \textbf{Languages:} Spanish C2 (native) \textbullet{} English C1
   (full work proficiency) \textbullet{} Italian (learning)
 \end{frame}
@@ -617,44 +566,5 @@
     \href{mailto:andresherencia2000@gmail.com}{andresherencia2000@gmail.com}}
 \end{frame}
 }
-
-\appendix
-
-\begin{frame}{Backup slides}
-  Extra company context and PresentIA delivery notes, if useful during Q\&A.
-\end{frame}
-
-\begin{frame}{Companies}
-  \begin{block}{Moody's}
-    Data, intelligence and analytical tools for business and financial
-    leaders --- more than 115 years of expertise.
-    \href{https://www.moodys.com/}{moodys.com}
-  \end{block}
-
-  \begin{exampleblock}{BBVA}
-    Global financial group (1857). Present in 25+ countries; leadership in
-    Spain, Mexico, South America and Turkey.
-    \href{https://www.bbva.com/en/}{bbva.com}
-  \end{exampleblock}
-
-  \begin{alertblock}{Cabify}
-    Ibero-American mobility platform in 40+ cities across 6 countries.
-    \href{https://cabify.com/en}{cabify.com}
-  \end{alertblock}
-\end{frame}
-
-\begin{frame}{PresentIA \textperiodcentered{} delivery notes}
-  \begin{itemize}
-    \item Auth, project and upload management, AI slide outlines, synchronous
-          \texttt{.pptx} generation, cost tracking, headless CLI.
-    \item Dev workflow: \texttt{mise}, Ruff, ESLint, pytest, E2E smoke tests
-          against deployed Cloud Run.
-    \item Architecture Decision Records for Terraform provider-interface IaC.
-    \item Path to InnoIT (Render + Supabase) via deployment profiles, without
-          rewriting core app logic.
-    \item Stack: Python, FastAPI, Pydantic, GCP, TypeScript, React, Docker,
-          Terraform, Supabase.
-  \end{itemize}
-\end{frame}
 
 \end{document}
