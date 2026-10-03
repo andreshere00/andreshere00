@@ -146,6 +146,7 @@ Documento de referencia con la información publicada en el perfil del jugador, 
 | Variación último día (03/10) | −307.085 (−0,18 %) |
 | Valor máximo reciente (serie) | 174.212.368 (30/09) |
 | Valor mínimo reciente (serie) | 69.641.365 (07/08) |
+| Puja máxima rentable | Sin rentabilidad |
 | Ventana gráfico | 30 días |
 | Temporada mercado en widget | 25/26 |
 
@@ -283,17 +284,17 @@ Modo seleccionado en capturas de referencia: **LaLiga Fantasy Oficial**.
 
 Columnas visibles: jornada, partido, valoraciones (estrellas / notas), **Puntos DAZN (0–4)**, iconos de eventos, **puntos totales LaLiga Fantasy**.
 
-| J | Partido | Salida | Nota A | Nota B | Puntos DAZN | Puntos Fantasy | Estadísticas crudas (bloque expandible) |
-| ---: | --- | ---: | ---: | ---: | ---: | ---: | --- |
-| 7 | SEV 1-3 BAR | 76' | 10 | 10,0 | 4 | 77 | Goles (3), tiros a puerta (3), tiros al palo (1), centros (1), regates (2), faltas rec. (1), robos (1), goles encajados (1), posesiones perdidas (4) |
-| 6 | BAR 7-2 RAC | 68' | 9 | 10,0 | 4 | 69 | Goles (3), penaltis (2), tiros a puerta (4), córners (1), centros (1), pases clave (1), regates (1), faltas rec. (1), goles encajados (2), oc. falladas (2), posesiones perdidas (4) |
-| 5 | LEV 2-4 BAR | 90' | 8 | 7,4 | 4 | 90 | Asistencias (2), asist. sin gol (1), tiros a puerta (1), córners (2), centros (1), pases clave (3), regates (2), robos (1), goles encajados (2), oc. creadas (1), posesiones perdidas (15) |
-| 4 | VAL 0-5 BAR | 90' | 8 | 7,0 | 2 | 90 | Goles (1), tiros a puerta (1), córners (1), pases clave (1), faltas rec. (2), oc. falladas (1), posesiones perdidas (13) |
-| 3 | BAR 5-2 RAY | 85' | 9 | 9,5 | 4 | 86 | Goles (2), tiros a puerta (3), córners (3), centros (1), pases clave (3), regates (4), goles encajados (2), oc. creadas/falladas (1/1), posesiones perdidas (10) |
-| 2 | ELC 0-5 BAR | 79' | 9 | 9,9 | 4 | 80 | Goles (2), penalti (1), asistencias (1), asist. sin gol (2), tiros a puerta (3), centros (1), pases clave (3), faltas rec. (1), despejes (1), oc. creadas (2), oc. falladas (1), posesiones perdidas (4) |
-| 1 | BAR 2-0 ATH | 62' | 9 | 7,9 | 4 | 63 | Gol (1), asist. sin gol (1), balones al área (3), tiros a puerta (1), tiros al palo (1), córners (1), centros (2), pases clave (3), regates (3), faltas com. (3), despejes (1), oc. falladas (1), posesiones perdidas (6) |
+| J | Partido | Salida | Estrellas | Nota num. | Puntos DAZN | Puntos LaLiga Fantasy | Eventos (iconos) | Estadísticas crudas (expandir ficha) |
+| ---: | --- | ---: | --- | ---: | ---: | ---: | --- | --- |
+| 7 | SEV 1-3 BAR | 76' | ★★★ | 10,0 | 4 | **21** | 2 goles, tarjeta amarilla | Goles (3), tiros a puerta (3), tiros al palo (1), centros (1), regates (2), faltas rec. (1), robos (1), goles encajados (1), posesiones perdidas (4) |
+| 6 | BAR 7-2 RAC | 68' | ★★★ | 10,0 | 4 | **21** | 2 goles, asistencia, penalti | Goles (3), penaltis (2), tiros a puerta (4), córners (1), centros (1), pases clave (1), regates (1), faltas rec. (1), goles encajados (2), oc. falladas (2), posesiones perdidas (4) |
+| 5 | LEV 2-4 BAR | 90' | ★★★ | 7,4 | 4 | **12** | 2 asistencias | Asistencias (2), asist. sin gol (1), tiros a puerta (1), córners (2), centros (1), pases clave (3), regates (2), robos (1), goles encajados (2), oc. creadas (1), posesiones perdidas (15) |
+| 4 | VAL 0-5 BAR | 90' | ★★ | 7,0 | 2 | **8** | 1 gol | Goles (1), tiros a puerta (1), córners (1), pases clave (1), faltas rec. (2), oc. falladas (1), posesiones perdidas (13) |
+| 3 | BAR 5-2 RAY | 85' | ★★★ | 9,5 | 4 | **16** | 2 goles | Goles (2), tiros a puerta (3), córners (3), centros (1), pases clave (3), regates (4), goles encajados (2), oc. creadas/falladas (1/1), posesiones perdidas (10) |
+| 2 | ELC 0-5 BAR | 79' | ★★★ | 9,9 | 4 | **24** | 2 goles, asistencia, penalti | Goles (2), penalti (1), asistencias (1), asist. sin gol (2), tiros a puerta (3), centros (1), pases clave (3), faltas rec. (1), despejes (1), oc. creadas (2), oc. falladas (1), posesiones perdidas (4) |
+| 1 | BAR 2-0 ATH | 62' | ★★ | 7,9 | 4 | **15** | 1 gol, tarjeta amarilla | Gol (1), asist. sin gol (1), balones al área (3), tiros a puerta (1), tiros al palo (1), córners (1), centros (2), pases clave (3), regates (3), faltas com. (3), despejes (1), oc. falladas (1), posesiones perdidas (6) |
 
-*Nota A / Nota B: columnas numéricas de valoración en tabla (distintos proveedores en UI).*
+*Puntos LaLiga Fantasy: columna total del partido (suma = 117). Estrellas / nota num.: valoraciones paralelas en la tabla. Los números del desglose expandible (p. ej. minutos, `X p`) son otro nivel de detalle.*
 
 ---
 
