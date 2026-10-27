@@ -106,8 +106,8 @@ export function App() {
                 motto={currentPreset.motto}
                 showSafeZoneGuide={false}
               />
-              <div className="absolute left-[48px] -bottom-[76px] z-20">
-                <Avatar className="w-[240px] h-[240px] border-[6px] border-[#0a1128] shadow-2xl">
+              <div className="absolute left-[64px] -bottom-[110px] z-20">
+                <Avatar className="w-[356px] h-[356px] border-[8px] border-white shadow-2xl">
                   <AvatarImage src="/assets/profile.jpg" alt="Andrés Herencia" />
                   <AvatarFallback className="bg-french-blue text-white text-4xl font-bold">
                     AH
@@ -116,13 +116,13 @@ export function App() {
               </div>
             </div>
 
-            <div className="pt-[92px] pb-6 px-12 bg-[#0a1128] text-white flex items-start justify-between">
+            <div className="pt-[116px] pb-6 px-12 bg-white text-slate-900 flex items-start justify-between">
               <div className="space-y-1">
-                <h2 className="text-2xl font-bold text-white">Andrés Herencia</h2>
-                <p className="text-base text-frosted-blue-2">
+                <h2 className="text-2xl font-bold text-slate-900">Andrés Herencia</h2>
+                <p className="text-base text-slate-700">
                   Forward Deployed AI Engineer @ Moody's Corporation (InnoIT) | 2x AWS-Certified
                 </p>
-                <p className="text-sm text-frosted-blue/70">
+                <p className="text-sm text-slate-500">
                   Madrid, Spain • andresherencia2000@gmail.com
                 </p>
               </div>
