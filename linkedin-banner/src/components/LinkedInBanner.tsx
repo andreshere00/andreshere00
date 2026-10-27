@@ -38,54 +38,54 @@ export const LinkedInBanner: React.FC<LinkedInBannerProps> = ({
         </div>
       )}
 
-      {/* Main Content Container — Balanced 2-Column Layout with Bold Typography */}
-      <div className="relative z-10 h-full w-full pl-[336px] pr-[48px] flex items-center justify-between gap-8">
+      {/* Main Content Container — Balanced 2-Column Layout */}
+      <div className="relative z-10 h-full w-full pl-[350px] pr-[60px] flex items-center justify-between gap-8">
         {/* Left/Center Column: Name, Motto, and Email */}
-        <div className="flex flex-col justify-center space-y-5">
+        <div className="flex flex-col justify-center space-y-4">
           {/* Name */}
-          <h1 className="text-[92px] font-black tracking-tight text-white leading-[0.95]">
+          <h1 className="text-[72px] font-black tracking-tight text-white leading-[0.98]">
             Andrés Herencia
           </h1>
 
           {/* CV-style \xrfill tertiary horizontal bar + Motto */}
-          <div className="space-y-4 pt-1">
+          <div className="space-y-3.5 pt-0.5">
             <div
-              className="h-[6px] w-48 rounded-full"
+              className="h-[5px] w-40 rounded-full"
               style={{
                 background:
                   "linear-gradient(90deg, var(--turquoise-surf), var(--sky-aqua))",
               }}
             />
-            <p className="text-[46px] font-bold text-light-cyan tracking-tight leading-[1.08]">
+            <p className="text-[36px] font-bold text-light-cyan tracking-tight leading-[1.1]">
               {motto}
             </p>
           </div>
 
           {/* Email + Personal Emblem */}
-          <div className="flex items-center gap-4 pt-2">
-            <Mail className="w-9 h-9 text-sky-aqua shrink-0 stroke-[2.25]" />
-            <span className="text-[36px] font-medium text-white tracking-normal leading-none">
+          <div className="flex items-center gap-3.5 pt-1.5">
+            <Mail className="w-7 h-7 text-sky-aqua shrink-0 stroke-[2.2]" />
+            <span className="text-[28px] font-medium text-white tracking-normal leading-none">
               andresherencia2000@gmail.com
             </span>
             <img
               src="/assets/logo-andres.png"
               alt="Andrés Herencia Emblem"
-              className="w-11 h-11 object-contain brightness-0 invert opacity-95 ml-1"
+              className="w-9 h-9 object-contain brightness-0 invert opacity-95 ml-1"
             />
           </div>
         </div>
 
-        {/* Right Column: Large, Clear Official AWS Certification Badges */}
+        {/* Right Column: Uncropped Official AWS Hexagonal Badges */}
         <div className="flex items-center gap-4 shrink-0">
           <img
             src="/assets/aws-mla.png"
             alt="AWS Certified Machine Learning Engineer – Associate"
-            className="w-[228px] h-[228px] object-contain drop-shadow-[0_12px_28px_rgba(0,0,0,0.5)]"
+            className="w-[216px] h-[216px] object-contain drop-shadow-[0_10px_22px_rgba(0,0,0,0.45)]"
           />
           <img
             src="/assets/aws-saa.png"
             alt="AWS Certified Solutions Architect – Associate"
-            className="w-[228px] h-[228px] object-contain drop-shadow-[0_12px_28px_rgba(0,0,0,0.5)]"
+            className="w-[216px] h-[216px] object-contain drop-shadow-[0_10px_22px_rgba(0,0,0,0.45)]"
           />
         </div>
       </div>
