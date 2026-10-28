@@ -1,0 +1,165 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
+@import "@fontsource-variable/hanken-grotesk";
+@import "@fontsource/dm-mono/300.css";
+@import "@fontsource/dm-mono/400.css";
+@import "@fontsource/dm-mono/500.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme inline {
+  --font-sans: "ABC Repro", "Hanken Grotesk Variable", system-ui, sans-serif;
+  --font-heading: var(--font-sans);
+  --font-mono: "ABC Repro Mono", "DM Mono", ui-monospace, monospace;
+
+  --color-orange: #ff6400;
+  --color-navy: #192227;
+  --color-charcoal: #273137;
+  --color-cool-gray-02: #29353d;
+  --color-slate: #36454d;
+  --color-steel: #455960;
+  --color-cool-gray-01: #6a7e8e;
+  --color-warm-gray-02: #d9d9d9;
+  --color-light-gray: #f0f0f0;
+  --color-warm-gray-01: #f7f7f7;
+  --color-teal: #00a4bd;
+  --color-diff-del: #fdecea;
+  --color-diff-del-strong: #f8b4ad;
+  --color-diff-add: #e6f6ec;
+  --color-diff-add-strong: #a6dfba;
+
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+  --color-foreground: var(--foreground);
+  --color-background: var(--background);
+
+  --radius-sm: var(--radius);
+  --radius-md: var(--radius);
+  --radius-lg: var(--radius);
+  --radius-xl: var(--radius);
+  --radius-2xl: var(--radius);
+  --radius-3xl: var(--radius);
+  --radius-4xl: var(--radius);
+
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #36454d;
+  --card: #ffffff;
+  --card-foreground: #36454d;
+  --popover: #ffffff;
+  --popover-foreground: #36454d;
+  --primary: #192227;
+  --primary-foreground: #ffffff;
+  --secondary: #f7f7f7;
+  --secondary-foreground: #192227;
+  --muted: #f7f7f7;
+  --muted-foreground: #455960;
+  --accent: #f0f0f0;
+  --accent-foreground: #192227;
+  --destructive: #c62828;
+  --border: #d9d9d9;
+  --input: #d9d9d9;
+  --ring: #ff6400;
+  --radius: 0px;
+  --header-height: 61px;
+}
+
+@media (min-width: 768px) {
+  :root {
+    --header-height: 71px;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  html {
+    @apply font-sans scroll-smooth;
+    scroll-padding-top: var(--header-height);
+  }
+  body {
+    @apply bg-background text-foreground text-base;
+    line-height: 150%;
+    letter-spacing: 0.01em;
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply text-navy font-normal;
+    line-height: 120%;
+  }
+  ::selection {
+    background: #ff6400;
+    color: #fff;
+  }
+}
+
+@layer components {
+  .module {
+    @apply mx-auto w-full max-w-[1440px] px-4 md:px-6 lg:px-8;
+  }
+  .section {
+    @apply py-8 md:py-[54px] lg:py-16;
+  }
+  .eyebrow {
+    @apply font-mono text-sm uppercase text-navy;
+    letter-spacing: 0.01em;
+  }
+  .heading-xl {
+    @apply text-[32px] md:text-[40px] uppercase;
+  }
+  .heading-lg {
+    @apply text-[28px] md:text-[32px] lg:text-[36px];
+  }
+  .hairline {
+    @apply border-t border-warm-gray-02;
+  }
+
+  .brand-hover {
+    @apply relative isolate overflow-hidden;
+  }
+  .brand-hover::before {
+    content: "";
+    @apply absolute inset-0 -z-10 bg-cool-gray-01;
+    clip-path: inset(0 100% 0 0);
+    transition: clip-path 0.35s ease;
+  }
+  .brand-hover:hover::before,
+  .brand-hover:focus-visible::before {
+    clip-path: inset(0 0 0 0);
+  }
+  .brand-hover-light::before {
+    @apply bg-warm-gray-02;
+  }
+
+  .bullet-list li {
+    @apply relative pl-7;
+  }
+  .bullet-list li::before {
+    content: "\2022";
+    @apply absolute left-2 text-orange;
+    font-size: 19px;
+    line-height: 1.3;
+  }
+}

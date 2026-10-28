@@ -1,0 +1,82 @@
+[project]
+name = "coding-agent"
+version = "0.1.0"
+description = "Local coding agent built on Google ADK: filesystem, memory, sandbox, OpenRouter LLM."
+requires-python = ">=3.11"
+dependencies = [
+    "google-adk>=2.13",
+    "litellm>=1.80",
+    "mcp>=1.9",
+    "python-docx>=1.1",
+    "defusedxml>=0.7",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "pytest-asyncio>=0.24", "ruff>=0.6", "poethepoet>=0.37"]
+
+[project.scripts]
+coding-agent = "coding_agent.cli:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[dependency-groups]
+dev = ["pytest>=8", "pytest-asyncio>=0.24", "ruff>=0.6", "poethepoet>=0.37"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/coding_agent"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "D"]
+ignore = ["D100", "D104", "D105", "D107", "D203", "D213"]
+
+[tool.ruff.lint.pydocstyle]
+convention = "google"
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["D"]
+
+[tool.poe.tasks.api]
+help = "Backend only: API on http://127.0.0.1:8000"
+cmd = "coding-agent serve"
+
+[tool.poe.tasks.web]
+help = "Frontend only: Vite dev server on http://127.0.0.1:5173 (proxies /api)"
+cmd = "npm --prefix web run dev -- --host 127.0.0.1"
+
+[tool.poe.tasks.web-install]
+help = "Install frontend dependencies"
+cmd = "npm --prefix web install"
+
+[tool.poe.tasks.web-build]
+help = "Build the frontend into web/dist (served by the API)"
+cmd = "npm --prefix web run build"
+
+[tool.poe.tasks.dev]
+help = "Launch backend and frontend together (open http://127.0.0.1:5173)"
+sequence = ["web-install", "dev-servers"]
+
+[tool.poe.tasks.dev-servers]
+parallel = ["api", "web"]
+
+[tool.poe.tasks.start]
+help = "Build the frontend and serve everything from the backend (http://127.0.0.1:8000)"
+sequence = ["web-install", "web-build", "api"]
+
+[tool.poe.tasks.test]
+help = "Run the backend tests"
+cmd = "pytest -q"
+
+[tool.poe.tasks.lint]
+help = "Lint backend and frontend"
+sequence = [{ cmd = "ruff check ." }, { cmd = "npm --prefix web run lint" }]
