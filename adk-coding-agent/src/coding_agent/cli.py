@@ -8,6 +8,7 @@ from google.genai import types
 
 from coding_agent.agent import build_agent
 from coding_agent.config import APP_NAME, Settings
+from coding_agent.examples import seed_examples
 from coding_agent.memory import build_memory_service, build_session_service
 from coding_agent.skills import SkillRepository
 
@@ -90,6 +91,7 @@ def main(argv: list[str] | None = None) -> None:
     serve_parser = commands.add_parser("serve", help="Serve the HTTP API and web UI.")
     serve_parser.add_argument("--host", default="127.0.0.1")
     serve_parser.add_argument("--port", type=int, default=8000)
+    commands.add_parser("seed-examples", help="Create sample Word documents in the workspace.")
     commands.add_parser("skills-sync", help="Fetch pinned third-party skills.")
     commands.add_parser("skills-list", help="List available skills.")
     args = parser.parse_args(argv)
@@ -102,11 +104,16 @@ def main(argv: list[str] | None = None) -> None:
     elif args.command == "skills-list":
         for skill in repository.load_all():
             print(f"{skill.name}: {skill.frontmatter.description[:90]}")
+    elif args.command == "seed-examples":
+        for path in seed_examples(settings.workspace_dir):
+            print(path)
     elif args.command == "serve":
         import uvicorn
 
         from coding_agent.api import create_app
 
+        if not any(settings.workspace_dir.rglob("*.docx")):
+            seed_examples(settings.workspace_dir)
         uvicorn.run(create_app(settings, static_dir=WEB_DIST), host=args.host, port=args.port)
     else:
         asyncio.run(chat(settings, args.session or uuid.uuid4().hex[:8], args.prompt))

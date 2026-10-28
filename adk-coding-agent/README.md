@@ -36,7 +36,10 @@ The UI (React, Vite, Tailwind, [shadcn/ui](https://ui.shadcn.com)) is built arou
 3. Ask questions about the content. Both documents and their diff are given to the model as
    context, so it answers from the text and cites block numbers.
 
-Skills and memory search are available below. For frontend development run `coding-agent serve`
+Sample documents with several versions (service agreement v1/v2/v3, meeting notes v1/v2, an
+identical privacy-policy pair) are created in `workspace/examples/` the first time `serve` finds no
+`.docx` files; run `coding-agent seed-examples` to create them at any time. Skills and memory
+search are available below. For frontend development run `coding-agent serve`
 and `npm run dev` in `web/` (Vite proxies `/api`). The visual style is documented in
 [`docs/DESIGN.md`](docs/DESIGN.md). The comparison API is `GET /api/documents`,
 `PUT /api/documents/{name}`, `POST /api/compare` and `POST /api/ask` (SSE).
