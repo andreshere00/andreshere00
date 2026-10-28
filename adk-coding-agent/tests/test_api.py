@@ -7,7 +7,8 @@ from coding_agent.api import create_app
 from coding_agent.cli import build_runner
 from coding_agent.config import Settings
 from coding_agent.sandbox import ProcessSandbox
-from test_agent_e2e import ScriptedLlm, call, say
+from conftest import make_docx
+from test_agent_e2e import ScriptedLlm, call, request_text, say
 
 # ---- Mocks, fixtures & helpers ---- #
 
@@ -32,6 +33,12 @@ def workspace_settings(settings: Settings) -> Settings:
     settings.workspace_dir.mkdir(parents=True)
     settings.data_dir.mkdir(parents=True)
     return settings
+
+
+def seed_versions(env: ProcessSandbox) -> None:
+    (env.working_dir / "documents").mkdir(exist_ok=True)
+    make_docx(env.working_dir / "documents" / "plan.v1.docx", ["Budget is 10 EUR."])
+    make_docx(env.working_dir / "documents" / "plan.v2.docx", ["Budget is 20 EUR.", "New risk."])
 
 
 # ---- Happy path ---- #
@@ -103,6 +110,72 @@ def test_memory_search_returns_text_saved_by_previous_chat(workspace_settings: S
     assert any("Orion" in entry["text"] for entry in found)
 
 
+def test_compare_returns_git_style_hunks_with_word_segments_and_stats(workspace_settings: Settings):
+    client, env = make_client(workspace_settings)
+    seed_versions(env)
+
+    body = client.post(
+        "/api/compare", json={"old": "documents/plan.v1.docx", "new": "documents/plan.v2.docx"}
+    ).json()
+
+    assert body["stats"] == {"changed": 1, "added": 1, "removed": 0}
+    deleted = next(
+        line for hunk in body["hunks"] for line in hunk["lines"] if line["type"] == "delete"
+    )
+    assert [(s["kind"], s["text"]) for s in deleted["segments"]] == [
+        ("equal", "Budget is "),
+        ("delete", "10"),
+        ("equal", " EUR."),
+    ]
+
+
+def test_upload_document_stores_valid_docx_under_documents_folder(workspace_settings: Settings):
+    client, env = make_client(workspace_settings)
+    source = make_docx(workspace_settings.workspace_dir / "src.docx", ["hello"])
+
+    response = client.put("/api/documents/My report.docx", content=source.read_bytes())
+
+    assert response.json()["path"] == "documents/My report.docx"
+    assert (env.working_dir / "documents" / "My report.docx").exists()
+    assert "documents/My report.docx" in [d["path"] for d in client.get("/api/documents").json()]
+
+
+def test_upload_document_existing_name_is_never_overwritten(workspace_settings: Settings):
+    client, _ = make_client(workspace_settings)
+    data = make_docx(workspace_settings.workspace_dir / "src.docx", ["hello"]).read_bytes()
+    client.put("/api/documents/a.docx", content=data)
+
+    second = client.put("/api/documents/a.docx", content=data).json()
+
+    assert second["path"] == "documents/a-2.docx"
+
+
+def test_ask_streams_answer_and_puts_documents_in_system_instruction(workspace_settings: Settings):
+    env = ProcessSandbox(workspace_settings.workspace_dir, timeout=30)
+    llm = ScriptedLlm(script=[say("The budget doubled [2].")])
+    runner = build_runner(workspace_settings, model=llm, environment=env)
+    client = TestClient(create_app(workspace_settings, runner=runner, environment=env))
+    seed_versions(env)
+
+    events = read_events(
+        client.post(
+            "/api/ask",
+            json={
+                "old": "documents/plan.v1.docx",
+                "new": "documents/plan.v2.docx",
+                "question": "What changed in the budget?",
+                "session_id": "q1",
+            },
+        )
+    )
+
+    system = str(llm.requests[0].config.system_instruction)
+    assert "Budget is 10 EUR." in system and "Budget is 20 EUR." in system
+    assert "+Budget is 20 EUR." in system
+    assert [e["kind"] for e in events][-2:] == ["message", "done"]
+    assert "Budget is 20 EUR." not in request_text(llm.requests[0]).split(system)[-1]
+
+
 # ---- Error paths ---- #
 
 
@@ -136,6 +209,52 @@ def test_session_history_unknown_session_returns_404(workspace_settings: Setting
     assert client.get("/api/sessions/missing").status_code == 404
 
 
+def test_upload_document_non_docx_extension_returns_400(workspace_settings: Settings):
+    client, _ = make_client(workspace_settings)
+
+    assert client.put("/api/documents/evil.exe", content=b"MZ").status_code == 400
+
+
+def test_upload_document_fake_docx_content_returns_400(workspace_settings: Settings):
+    client, _ = make_client(workspace_settings)
+
+    assert client.put("/api/documents/fake.docx", content=b"not a zip").status_code == 400
+
+
+def test_compare_path_traversal_returns_403(workspace_settings: Settings):
+    client, _ = make_client(workspace_settings)
+
+    response = client.post("/api/compare", json={"old": "../../etc/passwd", "new": "x.docx"})
+
+    assert response.status_code == 403
+
+
+def test_compare_missing_document_returns_404(workspace_settings: Settings):
+    client, _ = make_client(workspace_settings)
+
+    response = client.post("/api/compare", json={"old": "a.docx", "new": "b.docx"})
+
+    assert response.status_code == 404
+
+
+def test_compare_corrupt_docx_returns_422(workspace_settings: Settings):
+    client, env = make_client(workspace_settings)
+    (env.working_dir / "bad.docx").write_bytes(b"not a zip")
+    make_docx(env.working_dir / "ok.docx", ["x"])
+
+    assert (
+        client.post("/api/compare", json={"old": "bad.docx", "new": "ok.docx"}).status_code == 422
+    )
+
+
+def test_ask_unknown_document_returns_404(workspace_settings: Settings):
+    client, _ = make_client(workspace_settings)
+
+    response = client.post("/api/ask", json={"old": "a.docx", "new": "b.docx", "question": "?"})
+
+    assert response.status_code == 404
+
+
 # ---- Edge cases ---- #
 
 
@@ -166,3 +285,32 @@ def test_chat_oversized_tool_output_is_truncated(workspace_settings: Settings):
     result = next(e for e in events if e["kind"] == "tool_result")
     assert list(result["response"]) == ["truncated"]
     assert len(result["response"]["truncated"]) < 4100
+
+
+def test_compare_identical_documents_returns_no_hunks(workspace_settings: Settings):
+    client, env = make_client(workspace_settings)
+    make_docx(env.working_dir / "a.docx", ["Same."])
+    make_docx(env.working_dir / "b.docx", ["Same."])
+
+    body = client.post("/api/compare", json={"old": "a.docx", "new": "b.docx"}).json()
+
+    assert body["hunks"] == []
+    assert body["stats"] == {"changed": 0, "added": 0, "removed": 0}
+
+
+def test_compare_text_files_are_supported(workspace_settings: Settings):
+    client, env = make_client(workspace_settings)
+    (env.working_dir / "a.txt").write_text("one\ntwo\n")
+    (env.working_dir / "b.txt").write_text("one\nthree\n")
+
+    body = client.post("/api/compare", json={"old": "a.txt", "new": "b.txt"}).json()
+
+    assert body["stats"]["changed"] == 1
+
+
+def test_documents_listing_only_includes_docx_files(workspace_settings: Settings):
+    client, env = make_client(workspace_settings)
+    make_docx(env.working_dir / "a.docx", ["x"])
+    (env.working_dir / "notes.txt").write_text("x")
+
+    assert [d["path"] for d in client.get("/api/documents").json()] == ["a.docx"]

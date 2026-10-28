@@ -6,7 +6,7 @@ Text inside tracked insertions is included; tracked deletions are ignored, so th
 the "accepted changes" view of each file.
 
 Usage:
-    python diff_docs.py OLD NEW [--format markdown|json]
+    python diff_docs.py OLD NEW [--format markdown|json|unified]
 """
 
 import argparse
@@ -60,6 +60,30 @@ def extract_blocks(path: Path) -> list[str]:
     return blocks
 
 
+def word_segments(old: str, new: str) -> list[dict[str, str]]:
+    """Splits two texts into word-level segments.
+
+    Args:
+        old: Original text.
+        new: Updated text.
+
+    Returns:
+        Segments with `kind` (`equal`, `delete` or `insert`) and `text`, in reading order.
+    """
+    old_tokens, new_tokens = TOKEN_PATTERN.findall(old), TOKEN_PATTERN.findall(new)
+    segments: list[dict[str, str]] = []
+    matcher = difflib.SequenceMatcher(None, old_tokens, new_tokens, autojunk=False)
+    for op, a0, a1, b0, b1 in matcher.get_opcodes():
+        if op == "equal":
+            segments.append({"kind": "equal", "text": "".join(old_tokens[a0:a1])})
+            continue
+        if a1 > a0:
+            segments.append({"kind": "delete", "text": "".join(old_tokens[a0:a1])})
+        if b1 > b0:
+            segments.append({"kind": "insert", "text": "".join(new_tokens[b0:b1])})
+    return segments
+
+
 def word_diff(old: str, new: str) -> str:
     """Renders an inline word-level diff using `[-removed-]` and `{+added+}` markers.
 
@@ -70,18 +94,60 @@ def word_diff(old: str, new: str) -> str:
     Returns:
         The merged text with change markers.
     """
-    old_tokens, new_tokens = TOKEN_PATTERN.findall(old), TOKEN_PATTERN.findall(new)
-    parts: list[str] = []
-    matcher = difflib.SequenceMatcher(None, old_tokens, new_tokens, autojunk=False)
-    for op, a0, a1, b0, b1 in matcher.get_opcodes():
-        if op == "equal":
-            parts.append("".join(old_tokens[a0:a1]))
-            continue
-        if a1 > a0:
-            parts.append("[-" + "".join(old_tokens[a0:a1]).strip() + "-]")
-        if b1 > b0:
-            parts.append("{+" + "".join(new_tokens[b0:b1]).strip() + "+}")
-    return "".join(parts)
+    markers = {"equal": "{}", "delete": "[-{}-]", "insert": "{{+{}+}}"}
+    return "".join(
+        markers[s["kind"]].format(s["text"] if s["kind"] == "equal" else s["text"].strip())
+        for s in word_segments(old, new)
+    )
+
+
+def unified_hunks(old: list[str], new: list[str], context: int = 3) -> list[dict]:
+    """Builds git-style hunks with word-level highlights for edited lines.
+
+    Args:
+        old: Blocks of the original document.
+        new: Blocks of the updated document.
+        context: Unchanged blocks kept around each change.
+
+    Returns:
+        Hunks with `old_start`, `old_count`, `new_start`, `new_count` and `lines`. Each line has
+        `type` (context, delete, insert), `old_no`, `new_no`, `text` and, for lines that were
+        edited rather than wholly added or removed, word-level `segments`.
+    """
+    hunks: list[dict] = []
+    matcher = difflib.SequenceMatcher(None, old, new, autojunk=False)
+    for group in matcher.get_grouped_opcodes(context):
+        lines: list[dict] = []
+        for op, a0, a1, b0, b1 in group:
+            if op == "equal":
+                lines += [
+                    {
+                        "type": "context",
+                        "old_no": a0 + i + 1,
+                        "new_no": b0 + i + 1,
+                        "text": old[a0 + i],
+                    }
+                    for i in range(a1 - a0)
+                ]
+                continue
+            paired = min(a1 - a0, b1 - b0) if op == "replace" else 0
+            pairs = [word_segments(old[a0 + i], new[b0 + i]) for i in range(paired)]
+            for i in range(a1 - a0):
+                line = {"type": "delete", "old_no": a0 + i + 1, "new_no": None, "text": old[a0 + i]}
+                if i < paired:
+                    line["segments"] = [s for s in pairs[i] if s["kind"] != "insert"]
+                lines.append(line)
+            for j in range(b1 - b0):
+                line = {"type": "insert", "old_no": None, "new_no": b0 + j + 1, "text": new[b0 + j]}
+                if j < paired:
+                    line["segments"] = [s for s in pairs[j] if s["kind"] != "delete"]
+                lines.append(line)
+        first, last = group[0], group[-1]
+        hunks.append(
+            {"old_start": first[1] + 1, "old_count": last[2] - first[1],
+             "new_start": first[3] + 1, "new_count": last[4] - first[3], "lines": lines}
+        )  # fmt: skip
+    return hunks
 
 
 def compare(old: list[str], new: list[str]) -> list[dict]:
@@ -146,6 +212,27 @@ def render_markdown(old_path: Path, new_path: Path, changes: list[dict]) -> str:
     return "\n".join(lines)
 
 
+def render_unified(old_path: Path, new_path: Path, hunks: list[dict]) -> str:
+    """Formats hunks like `git diff` output.
+
+    Args:
+        old_path: Path of the original document.
+        new_path: Path of the updated document.
+        hunks: Records returned by `unified_hunks`.
+
+    Returns:
+        Text with `---`/`+++` headers, `@@` hunk headers and ` `, `-`, `+` prefixed lines.
+    """
+    prefixes = {"context": " ", "delete": "-", "insert": "+"}
+    lines = [f"--- {old_path.name}", f"+++ {new_path.name}"]
+    for hunk in hunks:
+        old_range = f"{hunk['old_start']},{hunk['old_count']}"
+        new_range = f"{hunk['new_start']},{hunk['new_count']}"
+        lines.append(f"@@ -{old_range} +{new_range} @@")
+        lines += [prefixes[line["type"]] + line["text"] for line in hunk["lines"]]
+    return "\n".join(lines)
+
+
 def main(argv: list[str] | None = None) -> int:
     """Command-line entry point.
 
@@ -158,13 +245,17 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("old", type=Path)
     parser.add_argument("new", type=Path)
-    parser.add_argument("--format", choices=["markdown", "json"], default="markdown")
+    parser.add_argument("--format", choices=["markdown", "json", "unified"], default="markdown")
     args = parser.parse_args(argv)
     for path in (args.old, args.new):
         if not path.is_file():
             print(f"error: file not found: {path}", file=sys.stderr)
             return 2
-    changes = compare(extract_blocks(args.old), extract_blocks(args.new))
+    old_blocks, new_blocks = extract_blocks(args.old), extract_blocks(args.new)
+    if args.format == "unified":
+        print(render_unified(args.old, args.new, unified_hunks(old_blocks, new_blocks)))
+        return 0
+    changes = compare(old_blocks, new_blocks)
     if args.format == "json":
         print(json.dumps(changes, indent=2, ensure_ascii=False))
     else:

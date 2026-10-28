@@ -1,4 +1,5 @@
 from google.adk.agents import LlmAgent
+from google.adk.agents.readonly_context import ReadonlyContext
 from google.adk.models import BaseLlm
 from google.adk.models.lite_llm import LiteLlm
 from google.adk.tools.environment import EnvironmentToolset
@@ -6,6 +7,7 @@ from google.adk.tools.load_memory_tool import load_memory_tool
 from google.adk.tools.skill_toolset import SkillToolset
 
 from coding_agent.config import APP_NAME, Settings
+from coding_agent.docdiff import DOC_CONTEXT_KEY
 from coding_agent.memory import InstructionMemoryTool, save_session_to_memory
 from coding_agent.sandbox import SandboxEnvironment, create_sandbox
 from coding_agent.skills import SkillRepository
@@ -24,6 +26,18 @@ You are a careful local coding agent working inside a sandboxed workspace.
   when the user refers to earlier work or preferences.
 - Verify your work by running it, then summarise what you changed and what you observed.
 """
+
+
+def build_instruction(context: ReadonlyContext) -> str:
+    """Builds the system instruction, adding the compared documents when a session has them.
+
+    Args:
+        context: ADK context exposing the session state.
+
+    Returns:
+        The base instruction, followed by the document context if present.
+    """
+    return "\n\n".join(filter(None, [INSTRUCTION, context.state.get(DOC_CONTEXT_KEY, "")]))
 
 
 def build_model(settings: Settings) -> LiteLlm:
@@ -67,7 +81,7 @@ def build_agent(
     return LlmAgent(
         name=APP_NAME,
         model=model or build_model(settings),
-        instruction=INSTRUCTION,
+        instruction=build_instruction,
         tools=[
             EnvironmentToolset(environment=env),
             SkillToolset(

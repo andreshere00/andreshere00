@@ -23,7 +23,8 @@ python .skills/doc-diff/scripts/diff_docs.py contract.v1.docx contract.v2.docx
 python .skills/doc-diff/scripts/diff_docs.py contract.v1.docx contract.v2.docx --format json
 ```
 
-Paths are relative to the workspace root.
+Add `--format unified` for git-style hunks (`@@ -a,b +c,d @@`, lines prefixed with space, `-`
+or `+`). Paths are relative to the workspace root.
 
 ## Reading the output
 

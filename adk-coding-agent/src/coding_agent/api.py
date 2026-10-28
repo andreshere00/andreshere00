@@ -1,10 +1,13 @@
+import io
 import json
+import re
 import uuid
+import zipfile
 from collections.abc import AsyncIterator
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from fastapi.staticfiles import StaticFiles
 from google.adk.events import Event
@@ -14,6 +17,7 @@ from pydantic import BaseModel
 
 from coding_agent.agent import build_agent
 from coding_agent.config import APP_NAME, Settings
+from coding_agent.docdiff import DOC_CONTEXT_KEY, DocumentComparer
 from coding_agent.memory import build_memory_service, build_session_service
 from coding_agent.sandbox import SandboxEnvironment, create_sandbox
 from coding_agent.skills import SkillRepository
@@ -22,6 +26,8 @@ DEFAULT_USER: str = "local"
 MAX_FILES: int = 500
 MAX_PREVIEW_BYTES: int = 200_000
 MAX_PAYLOAD_CHARS: int = 4_000
+MAX_UPLOAD_BYTES: int = 20 * 1024 * 1024
+UPLOAD_DIR: str = "documents"
 HIDDEN_DIRS: frozenset[str] = frozenset({".skills", ".git", "__pycache__", "node_modules", ".tmp"})
 
 
@@ -35,6 +41,30 @@ class ChatRequest(BaseModel):
 
     session_id: str | None = None
     message: str
+
+
+class CompareRequest(BaseModel):
+    """Body of `POST /api/compare`.
+
+    Attributes:
+        old: Workspace path of the original document.
+        new: Workspace path of the revised document.
+    """
+
+    old: str
+    new: str
+
+
+class AskRequest(CompareRequest):
+    """Body of `POST /api/ask`: a question about a document pair.
+
+    Attributes:
+        question: User question.
+        session_id: Conversation to continue; a new one is created when omitted.
+    """
+
+    question: str
+    session_id: str | None = None
 
 
 def event_to_items(event: Event) -> list[dict[str, Any]]:
@@ -72,6 +102,14 @@ def _clip(payload: Any) -> Any:
     return {"truncated": text[:MAX_PAYLOAD_CHARS] + "..."}
 
 
+def _is_docx(data: bytes) -> bool:
+    """Checks that bytes are a zip archive containing a Word document body."""
+    if not zipfile.is_zipfile(io.BytesIO(data)):
+        return False
+    with zipfile.ZipFile(io.BytesIO(data)) as archive:
+        return "word/document.xml" in archive.namelist()
+
+
 def _sse(payload: dict[str, Any]) -> str:
     return f"data: {json.dumps(payload, ensure_ascii=False)}\n\n"
 
@@ -99,6 +137,7 @@ def create_app(
     repository = SkillRepository(settings.skills_dir)
     sessions = build_session_service(settings)
     memory = build_memory_service(settings)
+    comparer = DocumentComparer(repository, env)
     state: dict[str, Runner] = {"runner": runner} if runner else {}
 
     def get_runner() -> Runner:
@@ -186,24 +225,88 @@ def create_app(
             raise HTTPException(status_code=404, detail="Session not found.")
         return [item for event in session.events for item in event_to_items(event)]
 
+    async def stream_turn(session_id: str, text: str) -> AsyncIterator[str]:
+        yield _sse({"kind": "session", "session_id": session_id})
+        try:
+            message = types.Content(role="user", parts=[types.Part(text=text)])
+            async for event in get_runner().run_async(
+                user_id=DEFAULT_USER, session_id=session_id, new_message=message
+            ):
+                for item in event_to_items(event):
+                    yield _sse(item)
+        except Exception as error:  # surfaced to the UI instead of dropping the stream
+            yield _sse({"kind": "error", "text": f"{type(error).__name__}: {error}"})
+        yield _sse({"kind": "done"})
+
     @app.post("/api/chat")
     async def chat(request: ChatRequest) -> StreamingResponse:
         session_id = request.session_id or uuid.uuid4().hex[:8]
+        return StreamingResponse(
+            stream_turn(session_id, request.message), media_type="text/event-stream"
+        )
 
-        async def stream() -> AsyncIterator[str]:
-            yield _sse({"kind": "session", "session_id": session_id})
-            try:
-                message = types.Content(role="user", parts=[types.Part(text=request.message)])
-                async for event in get_runner().run_async(
-                    user_id=DEFAULT_USER, session_id=session_id, new_message=message
-                ):
-                    for item in event_to_items(event):
-                        yield _sse(item)
-            except Exception as error:  # surfaced to the UI instead of dropping the stream
-                yield _sse({"kind": "error", "text": f"{type(error).__name__}: {error}"})
-            yield _sse({"kind": "done"})
+    @app.get("/api/documents")
+    async def documents() -> list[dict[str, Any]]:
+        return [f for f in list_files() if f["path"].lower().endswith(".docx")]
 
-        return StreamingResponse(stream(), media_type="text/event-stream")
+    @app.put("/api/documents/{name}")
+    async def upload_document(name: str, request: Request) -> dict[str, Any]:
+        declared = int(request.headers.get("content-length") or 0)
+        if declared > MAX_UPLOAD_BYTES:
+            raise HTTPException(status_code=413, detail="File is larger than 20 MB.")
+        data = await request.body()
+        safe = re.sub(r"[^\w.\- ]", "_", Path(name).name)
+        if not safe.lower().endswith(".docx"):
+            raise HTTPException(status_code=400, detail="Only .docx files are supported.")
+        if len(data) > MAX_UPLOAD_BYTES or not _is_docx(data):
+            raise HTTPException(status_code=400, detail="Not a valid Word (.docx) file.")
+        target = env.resolve(f"{UPLOAD_DIR}/{safe}")
+        counter = 2
+        while target.exists():
+            target = env.resolve(f"{UPLOAD_DIR}/{Path(safe).stem}-{counter}.docx")
+            counter += 1
+        await env.write_file(target, data)
+        return {"path": target.relative_to(env.working_dir).as_posix(), "size": len(data)}
+
+    @app.post("/api/compare")
+    async def compare(request: CompareRequest) -> dict[str, Any]:
+        try:
+            return comparer.compare(request.old, request.new)
+        except PermissionError as error:
+            raise HTTPException(status_code=403, detail=str(error)) from error
+        except FileNotFoundError as error:
+            raise HTTPException(status_code=404, detail=str(error)) from error
+        except Exception as error:  # corrupt documents surface as a readable 422
+            raise HTTPException(
+                status_code=422, detail=f"Cannot read documents: {error}"
+            ) from error
+
+    @app.post("/api/ask")
+    async def ask(request: AskRequest) -> StreamingResponse:
+        session_id = request.session_id or uuid.uuid4().hex[:8]
+        try:
+            context = comparer.build_context(request.old, request.new)
+        except PermissionError as error:
+            raise HTTPException(status_code=403, detail=str(error)) from error
+        except FileNotFoundError as error:
+            raise HTTPException(status_code=404, detail=str(error)) from error
+        except Exception as error:
+            raise HTTPException(
+                status_code=422, detail=f"Cannot read documents: {error}"
+            ) from error
+        existing = await sessions.get_session(
+            app_name=APP_NAME, user_id=DEFAULT_USER, session_id=session_id
+        )
+        if existing is None:
+            await sessions.create_session(
+                app_name=APP_NAME,
+                user_id=DEFAULT_USER,
+                session_id=session_id,
+                state={DOC_CONTEXT_KEY: context},
+            )
+        return StreamingResponse(
+            stream_turn(session_id, request.question), media_type="text/event-stream"
+        )
 
     if static_dir and static_dir.is_dir():
         app.mount("/", StaticFiles(directory=static_dir, html=True), name="web")
