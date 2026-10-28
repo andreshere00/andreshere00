@@ -27,10 +27,19 @@ cd web && npm install && npm run build && cd ..   # once
 coding-agent serve                                # http://127.0.0.1:8000
 ```
 
-The UI (React, Vite, Tailwind, [shadcn/ui](https://ui.shadcn.com)) offers streaming chat with visible
-tool calls, session history, a workspace file browser, the skills catalog and memory search. For
-frontend development run `coding-agent serve` and `npm run dev` in `web/` (Vite proxies `/api`). The
-visual style is documented in [`docs/DESIGN.md`](docs/DESIGN.md).
+The UI (React, Vite, Tailwind, [shadcn/ui](https://ui.shadcn.com)) is built around one task:
+
+1. Choose two Word documents from the workspace, or drop/upload `.docx` files (stored in
+   `workspace/documents/`).
+2. Read a git-style diff (unified or split, with line numbers, `@@` hunks and word-level
+   highlights) plus changed/added/removed counts.
+3. Ask questions about the content. Both documents and their diff are given to the model as
+   context, so it answers from the text and cites block numbers.
+
+Skills and memory search are available below. For frontend development run `coding-agent serve`
+and `npm run dev` in `web/` (Vite proxies `/api`). The visual style is documented in
+[`docs/DESIGN.md`](docs/DESIGN.md). The comparison API is `GET /api/documents`,
+`PUT /api/documents/{name}`, `POST /api/compare` and `POST /api/ask` (SSE).
 
 State lives in `.agent_data/` (sessions, long-term memory) and files in `workspace/`.
 

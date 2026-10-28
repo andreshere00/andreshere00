@@ -1,12 +1,10 @@
 import { useCallback, useEffect, useState, type ReactNode } from 'react'
-import { ChatPanel } from '@/components/chat-panel'
+import { CompareSection } from '@/components/compare-section'
 import { Hero } from '@/components/hero'
-import { KeyFigures } from '@/components/key-figures'
 import { MemorySection } from '@/components/memory-section'
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
 import { SkillsSection } from '@/components/skills-section'
-import { WorkspacePanel } from '@/components/workspace-panel'
 import { api, type Status } from '@/lib/api'
 
 function Section({ id, title, intro, children }: { id: string; title: string; intro: string; children: ReactNode }) {
@@ -35,22 +33,18 @@ export default function App() {
       <SiteHeader />
       <main className="pt-(--header-height)">
         <Hero />
-        <KeyFigures status={status} />
         {status && !status.llm_configured && (
           <p className="module bg-orange/10 py-3 font-mono text-sm text-navy">
-            OPENROUTER_API_KEY is not set. Chat will fail until you add it to .env and restart the server.
+            OPENROUTER_API_KEY is not set. Comparing works, but questions will fail until you add it to .env and restart the server.
           </p>
         )}
-        <Section id="chat" title="Chat" intro="Ask for code, document edits or comparisons. Tool calls are shown as they run in the sandbox.">
-          <ChatPanel onActivity={onActivity} />
+        <Section id="compare" title="Compare" intro="Pick two versions of a document. Changes appear like a git diff, and you can ask questions about either file.">
+          <CompareSection onActivity={onActivity} />
         </Section>
-        <Section id="workspace" title="Workspace" intro="Everything the agent reads and writes lives in one jailed folder.">
-          <WorkspacePanel refreshKey={activity} />
-        </Section>
-        <Section id="skills" title="Skills repository" intro="Local skills plus pinned third-party skills such as Anthropic's docx. Skills load on demand.">
+        <Section id="skills" title="Skills repository" intro="The doc-diff skill powers this view. Local skills plus pinned third-party skills such as Anthropic's docx.">
           <SkillsSection />
         </Section>
-        <Section id="memory" title="Memory" intro="Finished turns are indexed into long-term memory and recalled in later sessions.">
+        <Section id="memory" title="Memory" intro="Answers are indexed into long-term memory and recalled in later sessions.">
           <MemorySection />
         </Section>
       </main>

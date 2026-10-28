@@ -5,7 +5,7 @@ export function Hero() {
     <section id="top" className="flex flex-col">
       <div
         aria-hidden
-        className="relative h-[max(320px,calc(55vh-var(--header-height)))] w-full overflow-hidden bg-[#b8481a]"
+        className="relative h-[max(200px,calc(32vh-var(--header-height)))] w-full overflow-hidden bg-[#b8481a]"
       >
         <div
           className="absolute -inset-[10%] blur-[60px]"
@@ -23,17 +23,17 @@ export function Hero() {
       </div>
       <div className="module section grid grid-cols-12 gap-3 md:gap-3.5">
         <h1 className="heading-xl col-span-12 md:col-span-5">
-          Your local
+          See what
           <br />
-          coding agent
+          changed
         </h1>
         <div className="col-span-12 flex flex-col gap-6 md:col-span-6 md:col-start-7 lg:col-start-6">
           <p className="max-w-[60ch] text-lg md:text-xl">
-            Files, memory, a sandbox and a skills repository in one workspace. Write and run code,
-            edit Word documents and compare versions, all on your own machine.
+            Compare two Word documents in a git-style diff, then ask questions about what they
+            say. Everything runs on your own machine.
           </p>
-          <a href="#chat" className="eyebrow group inline-flex w-fit items-center gap-2 py-3 text-base">
-            Start a conversation
+          <a href="#compare" className="eyebrow group inline-flex w-fit items-center gap-2 py-3 text-base">
+            Compare documents
             <ArrowRight className="size-5 transition-transform group-hover:translate-x-1" />
           </a>
         </div>

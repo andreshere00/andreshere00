@@ -24,6 +24,10 @@
   --color-light-gray: #f0f0f0;
   --color-warm-gray-01: #f7f7f7;
   --color-teal: #00a4bd;
+  --color-diff-del: #fdecea;
+  --color-diff-del-strong: #f8b4ad;
+  --color-diff-add: #e6f6ec;
+  --color-diff-add-strong: #a6dfba;
 
   --color-ring: var(--ring);
   --color-input: var(--input);

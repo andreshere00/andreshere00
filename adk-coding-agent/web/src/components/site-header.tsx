@@ -1,8 +1,7 @@
 import { Button } from '@/components/ui/button'
 
 const NAV = [
-  { href: '#chat', label: 'Chat' },
-  { href: '#workspace', label: 'Workspace' },
+  { href: '#compare', label: 'Compare' },
   { href: '#skills', label: 'Skills' },
   { href: '#memory', label: 'Memory' },
 ]
