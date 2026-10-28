@@ -20,6 +20,18 @@ coding-agent chat                          # interactive
 coding-agent chat --prompt "Write fizzbuzz in fizz.py and run it" --session demo
 ```
 
+### Web UI
+
+```bash
+cd web && npm install && npm run build && cd ..   # once
+coding-agent serve                                # http://127.0.0.1:8000
+```
+
+The UI (React, Vite, Tailwind, [shadcn/ui](https://ui.shadcn.com)) offers streaming chat with visible
+tool calls, session history, a workspace file browser, the skills catalog and memory search. For
+frontend development run `coding-agent serve` and `npm run dev` in `web/` (Vite proxies `/api`). The
+visual style is documented in [`docs/DESIGN.md`](docs/DESIGN.md).
+
 State lives in `.agent_data/` (sessions, long-term memory) and files in `workspace/`.
 
 ## Sandbox
