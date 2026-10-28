@@ -20,6 +20,17 @@ coding-agent chat                          # interactive
 coding-agent chat --prompt "Write fizzbuzz in fizz.py and run it" --session demo
 ```
 
+### One command (poe)
+
+```bash
+uv pip install -e ".[dev]"
+poe dev     # installs web deps, then runs API (:8000) and Vite (:5173) together; Ctrl+C stops both
+poe start   # builds the frontend and serves everything from the API on :8000
+```
+
+`poe` alone lists all tasks (`api`, `web`, `web-build`, `test`, `lint`). Open
+http://127.0.0.1:5173 with `poe dev` (hot reload, `/api` is proxied to the backend).
+
 ### Web UI
 
 ```bash
