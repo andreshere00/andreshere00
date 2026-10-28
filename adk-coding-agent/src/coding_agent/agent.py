@@ -3,11 +3,10 @@ from google.adk.models import BaseLlm
 from google.adk.models.lite_llm import LiteLlm
 from google.adk.tools.environment import EnvironmentToolset
 from google.adk.tools.load_memory_tool import load_memory_tool
-from google.adk.tools.preload_memory_tool import PreloadMemoryTool
 from google.adk.tools.skill_toolset import SkillToolset
 
 from coding_agent.config import APP_NAME, Settings
-from coding_agent.memory import save_session_to_memory
+from coding_agent.memory import InstructionMemoryTool, save_session_to_memory
 from coding_agent.sandbox import SandboxEnvironment, create_sandbox
 from coding_agent.skills import SkillRepository
 
@@ -76,7 +75,7 @@ def build_agent(
                 environment=env,
                 skills_folder=env.working_dir / SKILLS_MOUNT,
             ),
-            PreloadMemoryTool(),
+            InstructionMemoryTool(),
             load_memory_tool,
         ],
         after_agent_callback=save_session_to_memory,

@@ -97,9 +97,28 @@ class SkillRepository:
         """
         skills: dict[str, Skill] = {}
         for directory in (self.vendor_dir, self.local_dir):
-            if directory.is_dir():
-                skills.update({skill.name: skill for skill in load_skills_from_dir(directory)})
+            skills.update({skill.name: skill for skill in _load_dir(directory)})
         return list(skills.values())
+
+    def catalog(self) -> list[dict[str, str]]:
+        """Lists available skills with their origin, for display purposes.
+
+        Returns:
+            One record per skill with `name`, `description` and `source` (`local` or `vendor`).
+        """
+        local = {skill.name for skill in _load_dir(self.local_dir)}
+        return [
+            {
+                "name": skill.name,
+                "description": skill.frontmatter.description,
+                "source": "local" if skill.name in local else "vendor",
+            }
+            for skill in self.load_all()
+        ]
+
+
+def _load_dir(directory: Path) -> list[Skill]:
+    return load_skills_from_dir(directory) if directory.is_dir() else []
 
 
 def _fetch(source: SkillSource, destination: Path) -> str:

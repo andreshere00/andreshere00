@@ -1,0 +1,210 @@
+import json
+import uuid
+from collections.abc import AsyncIterator
+from pathlib import Path
+from typing import Any
+
+from fastapi import FastAPI, HTTPException
+from fastapi.responses import StreamingResponse
+from fastapi.staticfiles import StaticFiles
+from google.adk.events import Event
+from google.adk.runners import Runner
+from google.genai import types
+from pydantic import BaseModel
+
+from coding_agent.agent import build_agent
+from coding_agent.config import APP_NAME, Settings
+from coding_agent.memory import build_memory_service, build_session_service
+from coding_agent.sandbox import SandboxEnvironment, create_sandbox
+from coding_agent.skills import SkillRepository
+
+DEFAULT_USER: str = "local"
+MAX_FILES: int = 500
+MAX_PREVIEW_BYTES: int = 200_000
+MAX_PAYLOAD_CHARS: int = 4_000
+HIDDEN_DIRS: frozenset[str] = frozenset({".skills", ".git", "__pycache__", "node_modules", ".tmp"})
+
+
+class ChatRequest(BaseModel):
+    """Body of `POST /api/chat`.
+
+    Attributes:
+        session_id: Conversation to continue; a new one is created when omitted.
+        message: User message.
+    """
+
+    session_id: str | None = None
+    message: str
+
+
+def event_to_items(event: Event) -> list[dict[str, Any]]:
+    """Converts an ADK event into UI-friendly items.
+
+    Args:
+        event: Event emitted by the runner or stored in a session.
+
+    Returns:
+        Items of kind `message`, `tool_call` or `tool_result`, in display order.
+    """
+    items: list[dict[str, Any]] = []
+    role = "user" if event.author == "user" else "assistant"
+    for part in (event.content.parts if event.content else None) or []:
+        if part.text and not part.thought:
+            items.append({"kind": "message", "role": role, "text": part.text})
+        if part.function_call:
+            items.append(
+                {"kind": "tool_call", "name": part.function_call.name,
+                 "args": _clip(part.function_call.args or {})}
+            )  # fmt: skip
+        if part.function_response:
+            items.append(
+                {"kind": "tool_result", "name": part.function_response.name,
+                 "response": _clip(part.function_response.response or {})}
+            )  # fmt: skip
+    return items
+
+
+def _clip(payload: Any) -> Any:
+    """Truncates oversized tool payloads so they stay cheap to send to the browser."""
+    text = json.dumps(payload, default=str, ensure_ascii=False)
+    if len(text) <= MAX_PAYLOAD_CHARS:
+        return json.loads(text)
+    return {"truncated": text[:MAX_PAYLOAD_CHARS] + "..."}
+
+
+def _sse(payload: dict[str, Any]) -> str:
+    return f"data: {json.dumps(payload, ensure_ascii=False)}\n\n"
+
+
+def create_app(
+    settings: Settings,
+    runner: Runner | None = None,
+    environment: SandboxEnvironment | None = None,
+    static_dir: Path | None = None,
+) -> FastAPI:
+    """Creates the HTTP API (and optionally serves the built web UI).
+
+    Args:
+        settings: Application settings.
+        runner: Optional pre-built runner, mainly for tests. Otherwise one is created lazily
+            on the first chat so the UI can start without an OpenRouter key.
+        environment: Optional sandbox override; shared by the runner and the file endpoints.
+        static_dir: Directory with the built frontend to serve at `/`.
+
+    Returns:
+        The FastAPI application.
+    """
+    app = FastAPI(title="Coding agent")
+    env = environment or create_sandbox(settings)
+    repository = SkillRepository(settings.skills_dir)
+    sessions = build_session_service(settings)
+    memory = build_memory_service(settings)
+    state: dict[str, Runner] = {"runner": runner} if runner else {}
+
+    def get_runner() -> Runner:
+        if "runner" not in state:
+            state["runner"] = Runner(
+                app_name=APP_NAME,
+                agent=build_agent(settings, environment=env),
+                session_service=sessions,
+                memory_service=memory,
+                auto_create_session=True,
+            )
+        return state["runner"]
+
+    def list_files() -> list[dict[str, Any]]:
+        root = env.working_dir
+        found: list[dict[str, Any]] = []
+        for path in sorted(root.rglob("*")):
+            relative = path.relative_to(root)
+            if HIDDEN_DIRS.intersection(relative.parts) or not path.is_file():
+                continue
+            stat = path.stat()
+            found.append(
+                {"path": relative.as_posix(), "size": stat.st_size, "modified": stat.st_mtime}
+            )
+        return found[:MAX_FILES]
+
+    @app.get("/api/status")
+    async def status() -> dict[str, Any]:
+        listed = await sessions.list_sessions(app_name=APP_NAME, user_id=DEFAULT_USER)
+        return {
+            "model": settings.openrouter_model,
+            "llm_configured": bool(settings.openrouter_api_key),
+            "sandbox": type(env).__name__.removesuffix("Sandbox").lower(),
+            "skills": len(repository.catalog()),
+            "files": len(list_files()),
+            "sessions": len(listed.sessions),
+        }
+
+    @app.get("/api/skills")
+    async def skills() -> list[dict[str, str]]:
+        return repository.catalog()
+
+    @app.get("/api/files")
+    async def files() -> list[dict[str, Any]]:
+        return list_files()
+
+    @app.get("/api/files/content")
+    async def file_content(path: str) -> dict[str, Any]:
+        try:
+            target = env.resolve(path)
+        except PermissionError as error:
+            raise HTTPException(status_code=403, detail=str(error)) from error
+        if not target.is_file():
+            raise HTTPException(status_code=404, detail="File not found.")
+        data = target.read_bytes()[:MAX_PREVIEW_BYTES]
+        try:
+            return {"path": path, "size": target.stat().st_size, "text": data.decode()}
+        except UnicodeDecodeError:
+            return {"path": path, "size": target.stat().st_size, "text": None}
+
+    @app.get("/api/memory")
+    async def search_memory(query: str) -> list[dict[str, Any]]:
+        found = await memory.search_memory(app_name=APP_NAME, user_id=DEFAULT_USER, query=query)
+        return [
+            {
+                "author": entry.author,
+                "timestamp": entry.timestamp,
+                "text": "".join(part.text or "" for part in entry.content.parts or []),
+            }
+            for entry in found.memories
+        ]
+
+    @app.get("/api/sessions")
+    async def list_sessions() -> list[dict[str, Any]]:
+        listed = await sessions.list_sessions(app_name=APP_NAME, user_id=DEFAULT_USER)
+        ordered = sorted(listed.sessions, key=lambda s: s.last_update_time, reverse=True)
+        return [{"id": s.id, "updated": s.last_update_time} for s in ordered]
+
+    @app.get("/api/sessions/{session_id}")
+    async def session_history(session_id: str) -> list[dict[str, Any]]:
+        session = await sessions.get_session(
+            app_name=APP_NAME, user_id=DEFAULT_USER, session_id=session_id
+        )
+        if session is None:
+            raise HTTPException(status_code=404, detail="Session not found.")
+        return [item for event in session.events for item in event_to_items(event)]
+
+    @app.post("/api/chat")
+    async def chat(request: ChatRequest) -> StreamingResponse:
+        session_id = request.session_id or uuid.uuid4().hex[:8]
+
+        async def stream() -> AsyncIterator[str]:
+            yield _sse({"kind": "session", "session_id": session_id})
+            try:
+                message = types.Content(role="user", parts=[types.Part(text=request.message)])
+                async for event in get_runner().run_async(
+                    user_id=DEFAULT_USER, session_id=session_id, new_message=message
+                ):
+                    for item in event_to_items(event):
+                        yield _sse(item)
+            except Exception as error:  # surfaced to the UI instead of dropping the stream
+                yield _sse({"kind": "error", "text": f"{type(error).__name__}: {error}"})
+            yield _sse({"kind": "done"})
+
+        return StreamingResponse(stream(), media_type="text/event-stream")
+
+    if static_dir and static_dir.is_dir():
+        app.mount("/", StaticFiles(directory=static_dir, html=True), name="web")
+    return app

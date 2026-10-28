@@ -95,17 +95,23 @@ async def test_ask_write_and_execute_tools_operate_on_the_workspace(settings: Se
     assert function_responses(llm)["Execute"]["stdout"].strip() == "42"
 
 
-async def test_ask_second_session_receives_memories_from_the_first(settings: Settings):
+async def test_ask_second_session_receives_memories_in_system_instruction(settings: Settings):
     env = ProcessSandbox(settings.workspace_dir, timeout=30)
     first = ScriptedLlm(script=[say("Noted.")])
-    await ask(build_runner(settings, model=first, environment=env), "u1", "s1",
-              "Remember that our staging cluster is called Orion")  # fmt: skip
+    await ask(
+        build_runner(settings, model=first, environment=env),
+        "u1",
+        "s1",
+        "Remember that our staging cluster is called Orion",
+    )
     second = ScriptedLlm(script=[say("Orion.")])
+    question = "What is the name of our staging cluster?"
 
-    await ask(build_runner(settings, model=second, environment=env), "u1", "s2",
-              "What is the name of our staging cluster?")  # fmt: skip
+    await ask(build_runner(settings, model=second, environment=env), "u1", "s2", question)
 
-    assert "Orion" in request_text(second.requests[0])
+    request = second.requests[0]
+    assert "Orion" in str(request.config.system_instruction)
+    assert request.contents[-1].parts[0].text == question
 
 
 # ---- Error paths ---- #

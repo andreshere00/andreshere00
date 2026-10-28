@@ -57,8 +57,9 @@ support for **Anthropic's `docx` skill**.
    - `SANDBOX_BACKEND=auto` picks Docker only when the image exists.
 5. **Two-tier memory.** Sessions keep conversation state per `session_id`. An
    `after_agent_callback` ingests each finished turn into long-term memory;
-   `PreloadMemoryTool` injects relevant past turns automatically and `load_memory` lets the
-   model search explicitly. Scope is `(app, user_id)`.
+   `InstructionMemoryTool` (a `PreloadMemoryTool` subclass) injects relevant past turns into
+   the system instruction, rather than as a trailing synthetic user message that can derail
+   tool loops, and `load_memory` lets the model search explicitly. Scope is `(app, user_id)`.
 6. **Skills repository with provenance.**
    - `skills/local/`: skills authored here (committed).
    - `skills/vendor/`: third-party skills fetched by `coding-agent skills-sync` from the git
@@ -94,8 +95,10 @@ adk-coding-agent/
 │   ├── memory.py                 session + memory services, save-turn callback
 │   ├── skills.py                 SkillRepository (sync, lock, load)
 │   ├── agent.py                  build_model, build_agent
-│   └── cli.py                    chat, skills-sync, skills-list
-└── tests/                        sandbox, skills, memory, diff script, agent e2e
+│   ├── api.py                    FastAPI: SSE chat, sessions, files, skills, memory
+│   └── cli.py                    chat, serve, skills-sync, skills-list
+├── web/                          React + Vite + Tailwind + shadcn/ui frontend
+└── tests/                        sandbox, skills, memory, diff script, agent e2e, api
 ```
 
 ## 4. Delivery phases
@@ -109,7 +112,9 @@ adk-coding-agent/
 | 5 | Skills repository + Anthropic docx | `SkillRepository`, `sources.toml`, sync/lock | done |
 | 6 | Document comparison | `doc-diff` skill and script | done |
 | 7 | Agent assembly + CLI | `build_agent`, `coding-agent chat` | done |
-| 8 | Tests | 43 tests (unit + scripted-LLM end-to-end through the real ADK runner) | done |
+| 8 | Tests | 56 tests (unit + scripted-LLM end-to-end through the real ADK runner + HTTP API) | done |
+| 9 | HTTP API | FastAPI app: SSE chat, sessions, files, skills, memory, status (`coding-agent serve`) | done |
+| 10 | Web UI | React + shadcn/ui frontend styled per `docs/DESIGN.md` | done (verified in Chrome against a stubbed LLM) |
 
 ## 5. Verification strategy
 

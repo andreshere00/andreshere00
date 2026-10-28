@@ -1,6 +1,7 @@
 import argparse
 import asyncio
 import uuid
+from pathlib import Path
 
 from google.adk.runners import Runner
 from google.genai import types
@@ -11,6 +12,7 @@ from coding_agent.memory import build_memory_service, build_session_service
 from coding_agent.skills import SkillRepository
 
 DEFAULT_USER: str = "local"
+WEB_DIST: Path = Path(__file__).resolve().parents[2] / "web" / "dist"
 
 
 def build_runner(settings: Settings, **agent_overrides) -> Runner:
@@ -85,6 +87,9 @@ def main(argv: list[str] | None = None) -> None:
     chat_parser = commands.add_parser("chat", help="Talk to the agent.")
     chat_parser.add_argument("--session", default=None, help="Session id to resume.")
     chat_parser.add_argument("--prompt", default=None, help="Run a single prompt and exit.")
+    serve_parser = commands.add_parser("serve", help="Serve the HTTP API and web UI.")
+    serve_parser.add_argument("--host", default="127.0.0.1")
+    serve_parser.add_argument("--port", type=int, default=8000)
     commands.add_parser("skills-sync", help="Fetch pinned third-party skills.")
     commands.add_parser("skills-list", help="List available skills.")
     args = parser.parse_args(argv)
@@ -97,5 +102,11 @@ def main(argv: list[str] | None = None) -> None:
     elif args.command == "skills-list":
         for skill in repository.load_all():
             print(f"{skill.name}: {skill.frontmatter.description[:90]}")
+    elif args.command == "serve":
+        import uvicorn
+
+        from coding_agent.api import create_app
+
+        uvicorn.run(create_app(settings, static_dir=WEB_DIST), host=args.host, port=args.port)
     else:
         asyncio.run(chat(settings, args.session or uuid.uuid4().hex[:8], args.prompt))
