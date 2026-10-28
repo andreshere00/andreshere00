@@ -24,9 +24,8 @@ coding-agent chat --prompt "Write fizzbuzz in fizz.py and run it" --session demo
 
 ```bash
 cd adk-coding-agent        # the project lives in this subfolder of the repo
-uv venv && uv pip install -e ".[dev]"
-source .venv/bin/activate
-poe dev     # installs web deps, then runs API (:8000) and Vite (:5173) together; Ctrl+C stops both
+uv sync            # installs the project and the dev group (pytest, ruff, poe)
+uv run poe dev     # installs web deps, then runs API (:8000) and Vite (:5173) together; Ctrl+C stops both
 poe start   # builds the frontend and serves everything from the API on :8000
 ```
 
