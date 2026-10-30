@@ -24,7 +24,7 @@ const Pop: React.FC<{delay?: number; style?: React.CSSProperties; children: Reac
 ) => {
   const s = usePop(delay);
   return (
-    <div style={{opacity: Math.min(1, s * 1.5), transform: `translateY(${(1 - s) * 40}px)`, ...style}}>
+    <div style={{opacity: Math.min(1, s * 1.5), ...style}}>
       {children}
     </div>
   );
@@ -73,7 +73,7 @@ const Hook: React.FC = () => (
   <AbsoluteFill>
     <Title>50 microservices.<br /><span style={{color: C.accent}}>ONE door.</span></Title>
     <Box x={290} y={560} w={420} h={180} label="API GATEWAY" color={C.accent} size={44} />
-    <Box x={140} y={420} w={200} h={90} label="App" size={36} />
+    <Box x={400} y={420} w={200} h={90} label="App" size={36} />
     {[0, 1, 2, 3, 4, 5].map((i) => {
       const x = 130 + i * 140;
       return <React.Fragment key={i}>
@@ -82,14 +82,13 @@ const Hook: React.FC = () => (
           borderRadius: 24, background: C.panel, border: "3px solid #2a3566"}} />
       </React.Fragment>;
     })}
-    <Line x1={340} y1={470} x2={290} y2={620} color={C.green} />
+    <Line x1={500} y1={510} x2={500} y2={560} color={C.green} />
     <Caption>Your phone talks to one door.</Caption>
   </AbsoluteFill>
 );
 
 const Problem: React.FC = () => {
   const frame = useCurrentFrame();
-  const shake = Math.sin(frame / 2) * 3;
   return (
     <AbsoluteFill>
       <Title color={C.warn}>No gateway = chaos</Title>
@@ -100,7 +99,7 @@ const Problem: React.FC = () => {
           {extrapolateLeft: "clamp", extrapolateRight: "clamp"});
         return <React.Fragment key={n}>
           <Line x1={500} y1={520} x2={p.x + 110} y2={p.y} color={C.warn} progress={prog} />
-          <Pop delay={0.6 + i * 0.4} style={{transform: `translateX(${shake}px)`}}>
+          <Pop delay={0.8 + i * 0.4}>
             <Box x={p.x} y={p.y} w={220} h={100} label={n} />
           </Pop>
         </React.Fragment>;
@@ -119,8 +118,10 @@ const Single: React.FC = () => (
     {SERVICES.map((n, i) => {
       const p = svcPos(i);
       return <React.Fragment key={n}>
-        <Line x1={500} y1={780} x2={p.x + 110} y2={p.y} color={C.accent} />
-        <Pop delay={1 + i * 0.25}><Box x={p.x} y={p.y} w={220} h={100} label={n} /></Pop>
+        <Pop delay={1 + i * 0.25}>
+          <Line x1={500} y1={780} x2={p.x + 110} y2={p.y} color={C.accent} />
+          <Box x={p.x} y={p.y} w={220} h={100} label={n} />
+        </Pop>
       </React.Fragment>;
     })}
     <Caption>Like the receptionist of a big building.</Caption>
